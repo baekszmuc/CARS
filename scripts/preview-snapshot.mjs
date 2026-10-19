@@ -11,6 +11,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import { chromium } from "@playwright/test";
 
 const out = path.resolve(process.argv[2] ?? "preview-out");
@@ -78,6 +79,17 @@ document.addEventListener("click", function (e) {
   var done = function (t) { span.textContent = t; setTimeout(function () { span.textContent = old; }, 1800); };
   try { navigator.clipboard.writeText(url).then(function () { done("복사되었습니다"); }, function () { done(url); }); } catch (err) { done(url); }
 });
+document.addEventListener("click", function (e) {
+  var t = e.target.closest('ul[aria-label="사진 선택"] button');
+  if (!t) return;
+  var list = t.closest("ul"), main = list.previousElementSibling.querySelector("img"), thumb = t.querySelector("img");
+  if (main && thumb) main.src = thumb.src;
+  list.querySelectorAll("button").forEach(function (b) {
+    var on = b === t;
+    b.setAttribute("aria-pressed", on);
+    b.classList.toggle("ring-2", on); b.classList.toggle("ring-obsidian", on); b.classList.toggle("opacity-75", !on);
+  });
+});
 document.addEventListener("submit", function (e) {
   e.preventDefault();
   var f = e.target, n = f.querySelector(".preview-note");
@@ -95,14 +107,34 @@ async function capture(file, isMain, adminMap, banner) {
         l.remove();
         return h;
       });
+      doc.querySelectorAll("img").forEach((img) => {
+        const src = img.getAttribute("src");
+        img.removeAttribute("srcset");
+        img.removeAttribute("sizes");
+        if (src && !src.startsWith("data:")) img.setAttribute("src", "@@IMG" + encodeURIComponent(src) + "@@");
+      });
       doc.querySelectorAll("[href]").forEach((a) => a.setAttribute("href", "@@" + encodeURIComponent(a.getAttribute("href")) + "@@"));
       return { css, head: doc.querySelector("head").innerHTML, body: doc.querySelector("body").innerHTML, htmlClass: doc.className, adminMapIn };
     },
     { adminMapIn: adminMap },
   );
   const css = await inlineCss(html.css);
+  // 이미지: 1200px webp 로 내려받아 img/ 에 저장
+  const imgs = [...new Set([...(html.head + html.body).matchAll(/@@IMG([^"@]*)@@/g)].map((m) => decodeURIComponent(m[1])))];
+  const imgMap = {};
+  for (const src of imgs) {
+    const u = new URL(src.replace(/&amp;/g, "&"), base);
+    if (u.pathname === "/_next/image") u.searchParams.set("w", "1200");
+    const res = await fetch(u, { headers: { Accept: "image/webp,image/*" } });
+    const buf = Buffer.from(await res.arrayBuffer());
+    const ext = (res.headers.get("content-type") ?? "").includes("webp") ? "webp" : (res.headers.get("content-type") ?? "").includes("png") ? "png" : "jpg";
+    const name = `img/${createHash("sha1").update(u.toString()).digest("hex").slice(0, 12)}.${ext}`;
+    fs.mkdirSync(path.join(out, "img"), { recursive: true });
+    fs.writeFileSync(path.join(out, name), buf);
+    imgMap[src] = name;
+  }
   const fix = (s) =>
-    s.replace(/href="@@([^"@]*)@@"/g, (_, e) => `href="${mapHref(decodeURIComponent(e), adminMap)}"`);
+    s.replace(/src="@@IMG([^"@]*)@@"/g, (_, e) => `src="${imgMap[decodeURIComponent(e)]}"`).replace(/href="@@([^"@]*)@@"/g, (_, e) => `href="${mapHref(decodeURIComponent(e), adminMap)}"`);
   const bannerHtml = `<div class="preview-banner">${banner}</div>`;
   const style = `<link rel="stylesheet" href="${FONTS}"><style>${css}
 .preview-banner{background:#26282c;color:#e9eaed;font-size:12px;line-height:1.5;padding:8px max(16px,env(safe-area-inset-left,0px));text-align:center}

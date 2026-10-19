@@ -6,10 +6,11 @@ import { InsuranceCard, MaintenanceCard, MunicipalCard, PartsCard, SupportCard, 
 import { ShareButton } from "./ShareButton";
 import { StatusBadge } from "./StatusBadge";
 import { VehicleCard } from "./VehicleCard";
+import { VehicleGallery } from "./VehicleGallery";
 import { VehiclePhoto } from "./VehiclePhoto";
 import { WhatsAppButton } from "./WhatsAppButton";
 import { ko } from "@/i18n/ko";
-import { sortPhotos } from "@/lib/data";
+import { photoUrl, sortPhotos } from "@/lib/data";
 import { billingUnitLabel, brandLabel, formatKm, vehicleTitle } from "@/lib/format";
 import { buildVehicleInquiryMessage, whatsappShareLink } from "@/lib/whatsapp";
 import type { HandoverItem, Settings, Vehicle } from "@/lib/types";
@@ -40,7 +41,6 @@ export function VehicleDetail({
   const title = vehicleTitle(vehicle);
   const brand = brandLabel(vehicle);
   const photos = sortPhotos(vehicle.vehicle_photos);
-  const [cover, ...rest] = photos;
   const message = buildVehicleInquiryMessage(vehicle, settings, url);
   const basics = [
     { label: ko.common.year, value: vehicle.model_year ? String(vehicle.model_year) : ko.common.pending },
@@ -59,15 +59,10 @@ export function VehicleDetail({
       {/* 1·2. 차량명 + 사진 / 가격 */}
       <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:gap-12">
         <div>
-          <VehiclePhoto photo={cover ?? null} label={title} className="aspect-[16/10] rounded-xl" priority sizes="(min-width: 1024px) 60vw, 100vw" />
-          {rest.length > 0 && (
-            <ul className="mt-3 grid grid-cols-4 gap-3" aria-label="추가 사진">
-              {rest.map((p) => (
-                <li key={p.id}>
-                  <VehiclePhoto photo={p} label={title} className="aspect-[4/3] rounded-md" sizes="20vw" />
-                </li>
-              ))}
-            </ul>
+          {photos.length > 1 ? (
+            <VehicleGallery photos={photos.map((p) => ({ id: p.id, url: photoUrl(p), alt: p.alt || title }))} />
+          ) : (
+            <VehiclePhoto photo={photos[0] ?? null} label={title} className="aspect-[16/10] rounded-xl" priority sizes="(min-width: 1024px) 60vw, 100vw" />
           )}
         </div>
 
