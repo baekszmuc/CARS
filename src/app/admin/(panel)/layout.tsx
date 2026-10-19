@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { LogoMark } from "@/components/LogoMark";
 import { getAdminContext } from "@/lib/admin";
 import { signOut } from "./actions";
 
@@ -24,7 +25,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <header className="bg-obsidian text-white">
         <div className="container-page flex flex-wrap items-center justify-between gap-3 py-3">
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="text-base font-extrabold tracking-[0.18em]">BS CARS</Link>
+            <Link href="/admin" aria-label="BS CARS 관리자 홈"><LogoMark className="h-[13px] w-auto text-white" /></Link>
             <span className="rounded bg-white/10 px-2 py-0.5 text-xs">관리자</span>
           </div>
           <div className="flex items-center gap-3 text-sm">

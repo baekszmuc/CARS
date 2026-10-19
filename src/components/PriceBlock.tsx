@@ -27,7 +27,7 @@ export function PriceBlock({
       <p className={`mt-1 tabular-nums ${big ? "price-final sm:text-4xl" : "price-final"}`} data-testid="price-total">
         {formatMoney(p.total, currency)} <span className="text-sm font-medium text-graphite">{per}</span>
       </p>
-      <dl className={`mt-3 grid gap-1 border-t border-silver pt-3 ${big ? "text-sm" : "text-[13px]"}`}>
+      <dl className={`mt-3 grid gap-1 border-t border-silver pt-3 ${big ? "text-sm" : "text-xs"}`}>
         <div className="flex justify-between gap-3">
           <dt className="text-graphite">기본 {unit} 렌트료</dt>
           <dd className="font-semibold tabular-nums" data-testid="price-base">

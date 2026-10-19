@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { getBrowserClient } from "@/lib/supabase/browser";
 import { BRANDING_BUCKET } from "@/lib/env";
+import { LogoMark } from "@/components/LogoMark";
 import { setLogo } from "@/app/admin/(panel)/actions";
 
 const ALLOWED: Record<string, string> = { "image/png": "png", "image/svg+xml": "svg", "image/webp": "webp", "image/jpeg": "jpg" };
@@ -37,7 +38,7 @@ export function LogoUploader({ currentUrl }: { currentUrl: string | null }) {
         {currentUrl ? (
           <img src={currentUrl} alt="현재 로고" className="h-10 w-auto object-contain" />
         ) : (
-          <span className="font-extrabold tracking-[0.18em] text-white">BS CARS</span>
+          <LogoMark className="h-3.5 w-auto text-white" />
         )}
       </div>
       <div className="grid gap-2">
@@ -53,7 +54,7 @@ export function LogoUploader({ currentUrl }: { currentUrl: string | null }) {
           </button>
         )}
       </div>
-      <p className="text-xs text-graphite">{currentUrl ? "" : "실제 로고가 없으면 텍스트 워드마크가 사용됩니다."} {msg}</p>
+      <p className="text-xs text-graphite">{currentUrl ? "" : "업로드한 로고가 없으면 기본 BS CARS 로고가 사용됩니다."} {msg}</p>
     </div>
   );
 }

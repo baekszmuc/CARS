@@ -66,7 +66,7 @@ export default async function HomePage() {
         <ul className="grid gap-px overflow-hidden rounded-xl border border-silver bg-silver sm:grid-cols-2 lg:grid-cols-3">
           {serviceSummary.map((s, i) => (
             <li key={s.title} className="bg-white p-5">
-              <p className="text-[11px] font-bold tracking-[0.16em] text-steel">{String(i + 1).padStart(2, "0")}</p>
+              <p className="text-[10px] font-bold tracking-[0.16em] text-steel">{String(i + 1).padStart(2, "0")}</p>
               <p className="mt-1 font-bold">{s.title}</p>
               <p className="mt-1 text-sm text-graphite">{s.text}</p>
             </li>

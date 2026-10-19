@@ -22,7 +22,7 @@ export function PhotoPlaceholder({ label, className = "" }: { label: string; cla
         <path d="M60 34h112l-24-17c-3-2-6-3-9-3H84c-4 0-7 1-10 4z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
         <path d="M116 14v20" stroke="currentColor" strokeWidth="2" />
       </svg>
-      <span className="text-[11px] font-semibold tracking-wide text-graphite">{ko.common.photoPending}</span>
+      <span className="text-[10px] font-semibold tracking-wide text-graphite">{ko.common.photoPending}</span>
     </div>
   );
 }

@@ -76,7 +76,7 @@ export function ComparisonTable({
 
   const head = (v: Vehicle, i: number) => (
     <>
-      <span className="block text-[11px] font-bold tracking-[0.16em] text-steel">OPTION {String(i + 1).padStart(2, "0")}</span>
+      <span className="block text-[10px] font-bold tracking-[0.16em] text-steel">OPTION {String(i + 1).padStart(2, "0")}</span>
       <span className="mt-1 block text-base font-bold">
         {brandLabel(v) && <span className="font-medium text-graphite">{brandLabel(v)} </span>}
         {vehicleTitle(v)}
@@ -108,7 +108,7 @@ export function ComparisonTable({
             return (
               <tbody key={g.key}>
                 <tr className="bg-mist">
-                  <th scope="rowgroup" colSpan={vehicles.length + 1} className="px-5 py-2 text-[11px] font-bold tracking-[0.12em] text-steel">
+                  <th scope="rowgroup" colSpan={vehicles.length + 1} className="px-5 py-2 text-[10px] font-bold tracking-[0.12em] text-steel">
                     {g.title}
                   </th>
                 </tr>
@@ -146,7 +146,7 @@ export function ComparisonTable({
               if (list.length === 0) return null;
               return (
                 <div key={g.key}>
-                  <p className="bg-mist px-4 py-1.5 text-[11px] font-bold tracking-[0.12em] text-steel">{g.title}</p>
+                  <p className="bg-mist px-4 py-1.5 text-[10px] font-bold tracking-[0.12em] text-steel">{g.title}</p>
                   <dl className="divide-y divide-silver text-sm">
                     {list.map((r) => (
                       <div key={r.label} className="flex justify-between gap-4 px-4 py-2.5">

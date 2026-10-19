@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { inter, notoKr, syncopate } from "./fonts";
+import { inter, notoKr } from "./fonts";
 import { getSettings, getSiteBase } from "@/lib/data";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -25,7 +25,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ko" className={`${inter.variable} ${notoKr.variable} ${syncopate.variable}`}>
+    <html lang="ko" className={`${inter.variable} ${notoKr.variable}`}>
       <body className="min-h-screen antialiased">{children}</body>
     </html>
   );

@@ -109,7 +109,7 @@ export function HandoverChecklist({
                         maxLength={500}
                         onBlur={(e) => e.target.value !== (c?.note ?? "") && save(item, status, e.target.value)}
                       />
-                      {c?.checked_at && <p className="mt-1 text-[11px] text-graphite">확인: {formatDateTime(c.checked_at)}</p>}
+                      {c?.checked_at && <p className="mt-1 text-[10px] text-graphite">확인: {formatDateTime(c.checked_at)}</p>}
                     </li>
                   );
                 })}

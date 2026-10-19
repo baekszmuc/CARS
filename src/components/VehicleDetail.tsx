@@ -17,7 +17,7 @@ import type { HandoverItem, Settings, Vehicle } from "@/lib/types";
 function Block({ n, title, id, children }: { n: string; title: string; id: string; children: React.ReactNode }) {
   return (
     <section className="border-t border-silver pt-10" aria-labelledby={id}>
-      <p className="text-[11px] font-bold tracking-[0.16em] text-steel">{n}</p>
+      <p className="text-[10px] font-bold tracking-[0.16em] text-steel">{n}</p>
       <h2 id={id} className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">{title}</h2>
       <div className="mt-6">{children}</div>
     </section>
@@ -73,7 +73,7 @@ export function VehicleDetail({
 
         <div className="lg:sticky lg:top-20 lg:self-start" data-testid="vehicle-main">
           <div className="flex items-center gap-3">
-            {brand && <p className="text-[11px] font-bold tracking-[0.16em] text-steel">{brand.toUpperCase()}</p>}
+            {brand && <p className="text-[10px] font-bold tracking-[0.16em] text-steel">{brand.toUpperCase()}</p>}
             <StatusBadge status={vehicle.status} />
           </div>
           <h1 className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl" data-testid="vehicle-title">{title}</h1>

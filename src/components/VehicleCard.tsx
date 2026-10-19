@@ -29,7 +29,7 @@ export function VehicleCard({
       </Link>
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-[11px] font-bold tracking-[0.16em] text-steel">
+          <p className="text-[10px] font-bold tracking-[0.16em] text-steel">
             {index !== undefined ? `OPTION ${String(index + 1).padStart(2, "0")}` : brand?.toUpperCase()}
           </p>
           <StatusBadge status={vehicle.status} />
@@ -40,7 +40,7 @@ export function VehicleCard({
         </h3>
         {vehicle.variant && <p className="mt-0.5 text-sm text-graphite">{vehicle.variant}</p>}
 
-        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 border-y border-silver py-3 text-[13px]">
+        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 border-y border-silver py-3 text-xs">
           <div>
             <dt className="text-graphite">{ko.common.year}</dt>
             <dd className="font-semibold">{vehicle.model_year ?? ko.common.pending}</dd>
