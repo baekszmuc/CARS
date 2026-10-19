@@ -33,6 +33,16 @@ export function vehicleTitle(v: Pick<Vehicle, "name" | "model_year">): string {
   return v.model_year ? `${v.name} ${v.model_year}` : v.name;
 }
 
+/** 차량명에 제조사가 이미 포함되어 있으면 null (예: "Kia Seltos") */
+export function brandLabel(v: Pick<Vehicle, "name" | "brand">): string | null {
+  if (!v.brand) return null;
+  return v.name.toLowerCase().startsWith(v.brand.toLowerCase()) ? null : v.brand;
+}
+
+export function specValue(v: Pick<Vehicle, "specs">, label: string): string | null {
+  return v.specs?.find((s) => s.label === label)?.value ?? null;
+}
+
 export interface PriceBreakdown {
   base: number;
   iva: number;

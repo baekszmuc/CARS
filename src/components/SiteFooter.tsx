@@ -7,9 +7,7 @@ export function SiteFooter({ settings }: { settings: Settings }) {
     <footer className="mt-24 bg-obsidian text-silver">
       <div className="container-page grid gap-10 py-14 md:grid-cols-3">
         <div>
-          <p className="text-lg font-extrabold tracking-[0.18em] text-white">
-            {settings.business_name.toUpperCase()}
-          </p>
+          <p className="wordmark text-base text-white">{settings.business_name.toUpperCase()}</p>
           <p className="mt-3 text-sm leading-relaxed text-steel">파라과이 차량 렌탈 및 차량 운영 관리 서비스</p>
         </div>
         <div>

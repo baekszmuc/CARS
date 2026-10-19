@@ -30,6 +30,10 @@ function dbMessage(error: { code?: string; message: string }): string {
 function vehicleInput(fd: FormData) {
   return {
     name: String(fd.get("name") ?? ""),
+    brand: String(fd.get("brand") ?? ""),
+    variant: String(fd.get("variant") ?? ""),
+    specs: String(fd.get("specs") ?? ""),
+    spec_note: String(fd.get("spec_note") ?? ""),
     model_year: String(fd.get("model_year") ?? ""),
     mileage_km: String(fd.get("mileage_km") ?? ""),
     base_price: String(fd.get("base_price") ?? ""),

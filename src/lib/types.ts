@@ -15,10 +15,19 @@ export interface VehiclePhoto {
   created_at: string;
 }
 
+export interface VehicleSpec {
+  label: string;
+  value: string;
+}
+
 export interface Vehicle {
   id: string;
   slug: string;
   name: string;
+  brand: string | null;
+  variant: string | null;
+  specs: VehicleSpec[];
+  spec_note: string | null;
   model_year: number | null;
   mileage_km: number | null;
   base_price: number;

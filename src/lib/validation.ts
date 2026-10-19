@@ -79,6 +79,31 @@ const optionalNum = (label: string, opts: { min?: number; max?: number; int?: bo
 
 export const vehicleSchema = z.object({
   name: z.string().trim().min(1, "차량명을 입력해 주세요.").max(80),
+  brand: optionalText(60),
+  variant: optionalText(120),
+  specs: z
+    .string()
+    .max(6000)
+    .transform((text, ctx) => {
+      const rows: { label: string; value: string }[] = [];
+      for (const line of text.split(/\r?\n/)) {
+        if (!line.trim()) continue;
+        const i = line.indexOf(":");
+        const label = i > 0 ? line.slice(0, i).trim() : "";
+        const value = i > 0 ? line.slice(i + 1).trim() : "";
+        if (!label || !value || label.length > 40 || value.length > 200) {
+          ctx.addIssue({ code: "custom", message: `사양 형식 오류: "${line.trim().slice(0, 40)}" — "항목: 값" 형식으로 입력하세요.` });
+          return z.NEVER;
+        }
+        rows.push({ label, value });
+      }
+      if (rows.length > 40) {
+        ctx.addIssue({ code: "custom", message: "사양은 40개까지 입력할 수 있습니다." });
+        return z.NEVER;
+      }
+      return rows;
+    }),
+  spec_note: optionalText(600),
   model_year: optionalNum("연식", { min: 1950, max: 2100, int: true }),
   mileage_km: optionalNum("주행거리", { min: 0, max: 5_000_000, int: true }),
   base_price: num("기본 렌트료", { min: 0, max: 10_000_000 }),

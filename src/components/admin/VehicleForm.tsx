@@ -62,6 +62,16 @@ export function VehicleForm({
           <Err msg={e.name} />
         </div>
         <div>
+          <label htmlFor="brand" className="field-label">제조사</label>
+          <input id="brand" name="brand" className="field" maxLength={60} defaultValue={vehicle?.brand ?? ""} placeholder="확인된 경우에만 입력" />
+          <Err msg={e.brand} />
+        </div>
+        <div>
+          <label htmlFor="variant" className="field-label">세부 모델 / 트림</label>
+          <input id="variant" name="variant" className="field" maxLength={120} defaultValue={vehicle?.variant ?? ""} placeholder="예: 1.6 Turbo HEV" />
+          <Err msg={e.variant} />
+        </div>
+        <div>
           <label htmlFor="model_year" className="field-label">연식</label>
           <input id="model_year" name="model_year" className="field" inputMode="numeric" value={year} onChange={(ev) => setYear(ev.target.value)} placeholder="미확인 시 비워 두기" />
           <Err msg={e.model_year} />
@@ -108,6 +118,25 @@ export function VehicleForm({
             <p className="mt-1 text-graphite">기본 렌트료를 입력하세요.</p>
           )}
           <p className="mt-1 text-xs text-graphite">IVA 금액과 IVA 포함 금액은 DB에서 기본 렌트료 × 세율로 자동 계산됩니다.</p>
+        </div>
+      </fieldset>
+
+      <fieldset className="grid gap-4 rounded-lg border border-silver p-4">
+        <legend className="px-1 text-sm font-bold">차량 사양</legend>
+        <div>
+          <label htmlFor="specs" className="field-label">사양 목록 (한 줄에 하나, &ldquo;항목: 값&rdquo;)</label>
+          <textarea id="specs" name="specs" rows={8} className="field font-mono text-sm"
+            defaultValue={(vehicle?.specs ?? []).map((s) => `${s.label}: ${s.value}`).join("\n")}
+            placeholder={"엔진: 1.5 터보 가솔린\n변속기: 자동 6단\n승차 정원: 5인"} />
+          <p className="field-hint">
+            비교표는 같은 항목명(엔진, 출력, 토크, 변속기, 구동 방식, 연료, 승차 정원, 전장 등)끼리 나란히 비교합니다. 확인된 사양만 입력하세요.
+          </p>
+          <Err msg={e.specs} />
+        </div>
+        <div>
+          <label htmlFor="spec_note" className="field-label">사양 출처 / 확인 안내</label>
+          <textarea id="spec_note" name="spec_note" rows={2} className="field text-sm" maxLength={600} defaultValue={vehicle?.spec_note ?? ""} />
+          <Err msg={e.spec_note} />
         </div>
       </fieldset>
 

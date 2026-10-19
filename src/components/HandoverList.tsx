@@ -10,9 +10,9 @@ export function HandoverList({ items, compact = false }: { items: HandoverItem[]
         const list = items.filter((i) => i.category === cat);
         const shown = compact ? list.slice(0, 4) : list;
         return (
-          <section key={cat} className="rounded-lg border border-silver p-6" aria-label={ko.handoverCategory[cat]}>
-            <h3 className="text-lg font-bold">{ko.handoverCategory[cat]}</h3>
-            <ul className="mt-4 space-y-2 text-sm">
+          <section key={cat} className="rounded-xl border border-silver bg-white p-5" aria-label={ko.handoverCategory[cat]}>
+            <h3 className="font-bold">{ko.handoverCategory[cat]}</h3>
+            <ul className="mt-3 space-y-1.5 text-sm">
               {shown.map((i) => (
                 <li key={i.id} className="flex gap-2">
                   <span aria-hidden="true" className="mt-2 h-1 w-1 shrink-0 rounded-full bg-obsidian" />

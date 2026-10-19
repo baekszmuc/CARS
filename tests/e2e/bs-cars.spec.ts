@@ -6,8 +6,8 @@ test.describe.configure({ mode: "serial" });
 
 const INITIAL = [
   { slug: "tivoli-2023", title: "Tivoli 2023", base: 800, iva: 80, total: 880, year: "2023", km: "25,000 km" },
-  { slug: "kia-seltos", title: "Kia Seltos", base: 900, iva: 90, total: 990, year: "정보 확인 중", km: "0 km" },
-  { slug: "tucson", title: "Tucson", base: 1100, iva: 110, total: 1210, year: "정보 확인 중", km: "0 km" },
+  { slug: "kia-seltos", title: "Kia Seltos 2027", base: 900, iva: 90, total: 990, year: "2027", km: "0 km" },
+  { slug: "tucson", title: "Tucson 2026", base: 1100, iva: 110, total: 1210, year: "2026", km: "0 km" },
 ];
 
 const TEST_NAME = `E2E Prueba ${Date.now().toString(36)}`;
@@ -16,15 +16,19 @@ let testVehicleSlug = "";
 let duplicateAdminUrl = "";
 
 async function cardFor(page: Page, title: string) {
-  return page.getByTestId("vehicle-card").filter({ has: page.getByRole("heading", { name: title, exact: true }) });
+  const esc = title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return page.getByTestId("vehicle-card").filter({ has: page.getByRole("heading", { name: new RegExp(`(^| )${esc}$`) }) });
 }
 
 test("1. BS CARS 웹사이트가 정상적으로 열린다", async ({ page }) => {
   const res = await page.goto("/");
   expect(res?.status()).toBe(200);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("당신의 이동을 위한 합리적인 선택.");
-  await expect(page.getByRole("link", { name: "차량 비교하기" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "렌탈 조건 확인하기" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("BS CARS 차량 옵션");
+  // 제품 우선: 첫 화면에 차량 카드 3개와 상세/문의 버튼
+  await expect(page.getByTestId("vehicle-card")).toHaveCount(3);
+  await expect(page.getByTestId("vehicle-card").first()).toBeInViewport();
+  await expect(page.getByTestId("vehicle-card").first().getByRole("link", { name: "상세 정보" })).toBeVisible();
+  await expect(page.getByTestId("comparison-table")).toBeVisible();
   await expect(page.getByRole("heading", { name: "렌트료에 포함된 서비스" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "차량 인수 시 함께 제공되는 항목" })).toBeVisible();
   for (const p of ["/vehiculos", "/servicios", "/incluye", "/contacto", "/privacidad"]) {
@@ -38,6 +42,7 @@ test("2·3. 초기 차량 3종이 정확한 가격으로 표시되고 IVA 합계
     const card = await cardFor(page, v.title);
     await expect(card).toHaveCount(1);
     await expect(card.getByTestId("price-base")).toHaveText(`USD ${v.base.toLocaleString("en-US")} / 월`);
+    await expect(card).toContainText(`OPTION 0${INITIAL.indexOf(v) + 1}`);
     await expect(card.getByTestId("price-iva")).toHaveText(`USD ${v.iva.toLocaleString("en-US")}`);
     await expect(card.getByTestId("price-total")).toHaveText(`USD ${v.total.toLocaleString("en-US")} / 월`);
     const base = money(await card.getByTestId("price-base").innerText());
@@ -53,13 +58,16 @@ test("2·3. 초기 차량 3종이 정확한 가격으로 표시되고 IVA 합계
     expect(text).toContain(v.title);
     expect(text).toContain(`USD ${v.total.toLocaleString("en-US")}`);
   }
-  expect(text).toContain("정보 확인 중");
   expect(text).toContain("25,000 km");
+  expect(text).toContain("1.5 CRDi 터보 디젤");
+  expect(text).toContain("자동 8단");
   // 상세 페이지 가격
   for (const v of INITIAL) {
     await page.goto(`/vehiculos/${v.slug}`);
     await expect(page.getByTestId("vehicle-title")).toHaveText(v.title);
-    await expect(page.getByTestId("price-total")).toContainText(`USD ${v.total.toLocaleString("en-US")}`);
+    await expect(page.getByRole("heading", { name: "차량 사양" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "다른 차량 옵션" })).toBeVisible();
+    await expect(page.getByTestId("vehicle-main").getByTestId("price-total")).toContainText(`USD ${v.total.toLocaleString("en-US")}`);
   }
 });
 
@@ -89,7 +97,7 @@ test("8. 관리자 로그인 없이 차량 정보를 변경할 수 없다", asyn
   expect(up.ok()).toBeFalsy();
 
   await page.goto("/vehiculos/tucson");
-  await expect(page.getByTestId("price-base")).toContainText("USD 1,100");
+  await expect(page.getByTestId("vehicle-main").getByTestId("price-base")).toContainText("USD 1,100");
 });
 
 test("4. 차량 등록 시 고유 URL이 자동 생성되고 중복 시 식별자가 붙는다", async ({ page }) => {
@@ -124,7 +132,7 @@ test("5·14. 차량 링크가 상세 페이지를 열고, 직접 입력·새로�
   const res = await page.goto(`/vehiculos/${testVehicleSlug}`);
   expect(res?.status()).toBe(200);
   await expect(page.getByTestId("vehicle-title")).toHaveText(`${TEST_NAME} 2024`);
-  await expect(page.getByTestId("price-total")).toContainText("USD 770");
+  await expect(page.getByTestId("vehicle-main").getByTestId("price-total")).toContainText("USD 770");
   await page.reload();
   await expect(page.getByTestId("vehicle-title")).toHaveText(`${TEST_NAME} 2024`);
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", new RegExp(TEST_NAME));
@@ -145,8 +153,8 @@ test("6. 링크 복사 버튼이 정상 작동한다", async ({ page, context })
 test("7. WhatsApp 메시지에 올바른 차량 정보와 링크가 들어간다", async ({ page }) => {
   // 번호 미등록 상태: 잘못된 링크 대신 안내 문구
   await page.goto("/vehiculos/kia-seltos");
-  await expect(page.getByTestId("whatsapp-missing")).toBeVisible();
-  await expect(page.getByTestId("whatsapp-link")).toHaveCount(0);
+  await expect(page.getByTestId("vehicle-main").getByTestId("whatsapp-missing")).toBeVisible();
+  await expect(page.getByTestId("vehicle-main").getByTestId("whatsapp-link")).toHaveCount(0);
 
   await login(page);
   await page.goto("/admin/configuracion");
@@ -155,13 +163,13 @@ test("7. WhatsApp 메시지에 올바른 차량 정보와 링크가 들어간다
   await expect(page.getByTestId("form-message")).toHaveText("설정이 저장되었습니다.");
 
   await page.goto("/vehiculos/kia-seltos");
-  const href = await page.getByTestId("whatsapp-link").getAttribute("href");
+  const href = await page.getByTestId("vehicle-main").getByTestId("whatsapp-link").getAttribute("href");
   expect(href).toMatch(/^https:\/\/wa\.me\/595981000000\?text=/);
   const msg = decodeURIComponent(href!.split("?text=")[1]);
   expect(msg).toBe(
     [
       "안녕하세요. BS CARS 차량 렌탈에 대해 문의드립니다.",
-      "관심 차량: Kia Seltos",
+      "관심 차량: Kia Seltos 2027",
       "월 렌트료: USD 900 + IVA",
       "IVA 포함 가격: USD 990",
       "차량의 이용 가능 여부와 렌탈 조건을 안내해 주실 수 있을까요?",
@@ -184,9 +192,9 @@ test("9. 차량 가격 변경이 고객용 사이트에 반영된다", async ({ 
   await expect(page.getByTestId("form-message")).toContainText("저장되었습니다");
 
   await page.goto(`/vehiculos/${testVehicleSlug}`);
-  await expect(page.getByTestId("price-base")).toContainText("USD 750");
-  await expect(page.getByTestId("price-iva")).toHaveText("USD 75");
-  await expect(page.getByTestId("price-total")).toContainText("USD 825");
+  await expect(page.getByTestId("vehicle-main").getByTestId("price-base")).toContainText("USD 750");
+  await expect(page.getByTestId("vehicle-main").getByTestId("price-iva")).toHaveText("USD 75");
+  await expect(page.getByTestId("vehicle-main").getByTestId("price-total")).toContainText("USD 825");
   await page.goto("/vehiculos");
   await expect((await cardFor(page, `${TEST_NAME} 2024`)).getByTestId("price-total")).toContainText("USD 825");
 });
@@ -263,12 +271,12 @@ test("12. 모바일에서 비교표와 차량 페이지가 정상 표시된다",
   await expect(page.getByTestId("comparison-table")).toBeHidden();
   const cards = page.getByTestId("comparison-cards");
   await expect(cards).toBeVisible();
-  await expect(cards.getByRole("heading", { name: "Tucson" })).toBeVisible();
+  await expect(cards.getByRole("heading", { name: /Tucson 2026/ })).toBeVisible();
   await expect(cards).toContainText("USD 1,210");
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
   await page.goto("/vehiculos/tivoli-2023");
-  await expect(page.getByTestId("price-total")).toBeVisible();
+  await expect(page.getByTestId("vehicle-main").getByTestId("price-total")).toBeVisible();
   const overflow2 = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow2).toBeLessThanOrEqual(0);
   await page.screenshot({ path: "test-results/mobile-vehicle.png", fullPage: true });

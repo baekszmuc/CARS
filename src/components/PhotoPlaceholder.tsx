@@ -6,14 +6,23 @@ export function PhotoPlaceholder({ label, className = "" }: { label: string; cla
     <div
       role="img"
       aria-label={`${label} — ${ko.common.photoPending}`}
-      className={`flex flex-col items-center justify-center gap-2 bg-[repeating-linear-gradient(135deg,#eceef1_0,#eceef1_10px,#f5f6f7_10px,#f5f6f7_20px)] text-graphite ${className}`}
+      className={`relative flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-[#f3f4f6] to-[#e4e6ea] text-steel ${className}`}
     >
-      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="1.4" />
-        <circle cx="12" cy="12.5" r="3.5" stroke="currentColor" strokeWidth="1.4" />
-        <path d="M8 6l1.5-2h5L16 6" stroke="currentColor" strokeWidth="1.4" />
+      {/* 일반 SUV 실루엣 (특정 차량을 묘사하지 않음) */}
+      <svg viewBox="0 0 240 90" className="w-2/5 max-w-[220px]" fill="none" aria-hidden="true">
+        <path
+          d="M14 66h12m40 0h104m40 0h16c3 0 5-2 5-5V50c0-5-3-8-8-9l-30-6-26-18c-4-3-8-4-13-4H82c-6 0-10 2-14 6L52 34l-26 5c-6 1-10 5-10 11v11c0 3 2 5 5 5"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <circle cx="46" cy="66" r="13" stroke="currentColor" strokeWidth="2.5" />
+        <circle cx="190" cy="66" r="13" stroke="currentColor" strokeWidth="2.5" />
+        <path d="M60 34h112l-24-17c-3-2-6-3-9-3H84c-4 0-7 1-10 4z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+        <path d="M116 14v20" stroke="currentColor" strokeWidth="2" />
       </svg>
-      <span className="text-xs font-semibold tracking-wide">{ko.common.photoPending}</span>
+      <span className="text-[11px] font-semibold tracking-wide text-graphite">{ko.common.photoPending}</span>
     </div>
   );
 }

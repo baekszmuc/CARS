@@ -12,7 +12,8 @@
     "db:start": "supabase start -x realtime,studio,edge-runtime,logflare,vector,supavisor,postgres-meta,imgproxy,mailpit",
     "db:reset": "supabase db reset",
     "db:push": "supabase db push",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "preview:snapshot": "node scripts/preview-snapshot.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
