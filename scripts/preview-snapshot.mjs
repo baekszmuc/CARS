@@ -8,6 +8,8 @@
  * - 스크립트 제거 (링크 복사·문의 양식은 미리보기용 최소 스크립트로 대체)
  * - 내부 링크를 미리보기 파일명으로 변환
  * - 관리자 화면은 로그인 후 읽기 전용 스냅샷으로 포함 (E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD)
+ * - PREVIEW_PUBLIC_URL 이 있으면 차량 링크(문의 메시지·링크 복사)를 그 주소의 미리보기 페이지로 바꾼다
+ *   예: PREVIEW_PUBLIC_URL=https://baekszmuc.github.io/CARS
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -16,6 +18,18 @@ import { chromium } from "@playwright/test";
 
 const out = path.resolve(process.argv[2] ?? "preview-out");
 const base = (process.argv[3] ?? "http://localhost:3000").replace(/\/$/, "");
+const publicUrl = (process.env.PREVIEW_PUBLIC_URL ?? "").replace(/\/$/, "");
+
+/** 사이트 기준 주소로 만들어진 차량 링크를 공개 미리보기 주소로 바꾼다 (평문·URL 인코딩 모두) */
+function toPublicLinks(html) {
+  if (!publicUrl) return html;
+  const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const raw = new RegExp(esc(`${base}/vehiculos/`) + "([a-z0-9-]+)", "g");
+  const enc = new RegExp(esc(encodeURIComponent(`${base}/vehiculos/`)) + "([a-z0-9-]+)", "g");
+  return html
+    .replace(raw, (_, slug) => `${publicUrl}/vehiculo-${slug}.html`)
+    .replace(enc, (_, slug) => encodeURIComponent(`${publicUrl}/vehiculo-${slug}.html`));
+}
 const email = process.env.E2E_ADMIN_EMAIL ?? "admin@bscars.local";
 const password = process.env.E2E_ADMIN_PASSWORD ?? "TestPassword123!";
 const exe = fs.existsSync("/opt/pw-browsers/chromium") ? "/opt/pw-browsers/chromium" : undefined;
@@ -134,7 +148,7 @@ async function capture(file, isMain, adminMap, banner) {
     imgMap[src] = name;
   }
   const fix = (s) =>
-    s.replace(/src="@@IMG([^"@]*)@@"/g, (_, e) => `src="${imgMap[decodeURIComponent(e)]}"`).replace(/href="@@([^"@]*)@@"/g, (_, e) => `href="${mapHref(decodeURIComponent(e), adminMap)}"`);
+    toPublicLinks(s).replace(/src="@@IMG([^"@]*)@@"/g, (_, e) => `src="${imgMap[decodeURIComponent(e)]}"`).replace(/href="@@([^"@]*)@@"/g, (_, e) => `href="${mapHref(toPublicLinks(decodeURIComponent(e)), adminMap)}"`);
   const bannerHtml = `<div class="preview-banner">${banner}</div>`;
   const style = `<link rel="stylesheet" href="${FONTS}"><style>${css}
 .preview-banner{background:#26282c;color:#e9eaed;font-size:12px;line-height:1.5;padding:8px max(16px,env(safe-area-inset-left,0px));text-align:center}
