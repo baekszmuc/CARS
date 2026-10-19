@@ -173,7 +173,7 @@ export function VehicleDetail({
         </Block>
 
         {/* 6. 서류·비품 */}
-        <Block n="04" title="차량 서류 및 인수 품목" id="handover">
+        <Block n="04" title="렌트 시 제공되는 서류 및 비품" id="handover">
           <p className="-mt-2 mb-5 text-sm text-graphite">
             계약상 기본 제공 목록입니다. 각 항목의 실제 제공 여부는 계약 및 차량별 확인 사항에 따릅니다.
           </p>

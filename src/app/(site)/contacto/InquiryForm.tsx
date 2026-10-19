@@ -74,7 +74,7 @@ export function InquiryForm({ vehicles, selectedSlug }: { vehicles: Option[]; se
           <Err msg={e.vehicle_id} id="vehicle-err" />
         </div>
         <div>
-          <label htmlFor="pickup_date" className="field-label">희망 인수일</label>
+          <label htmlFor="pickup_date" className="field-label">희망 렌트 시작일</label>
           <input id="pickup_date" name="pickup_date" type="date" className="field" min={today} />
           <Err msg={e.pickup_date} id="pickup-err" />
         </div>

@@ -56,7 +56,7 @@ export const ko = {
     home: "홈",
     vehicles: "차량",
     services: "포함 서비스",
-    includes: "인수 품목",
+    includes: "렌트 시 제공 품목",
     contact: "문의",
   },
   hero: {

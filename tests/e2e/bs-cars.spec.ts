@@ -30,7 +30,7 @@ test("1. BS CARS 웹사이트가 정상적으로 열린다", async ({ page }) =>
   await expect(page.getByTestId("vehicle-card").first().getByRole("link", { name: "상세 정보" })).toBeVisible();
   await expect(page.getByTestId("comparison-table")).toBeVisible();
   await expect(page.getByRole("heading", { name: "렌트료에 포함된 서비스" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "차량 인수 시 함께 제공되는 항목" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "차량 렌트 시 함께 제공되는 항목" })).toBeVisible();
   for (const p of ["/vehiculos", "/servicios", "/incluye", "/contacto", "/privacidad"]) {
     expect((await page.goto(p))?.status(), p).toBe(200);
   }
@@ -243,12 +243,12 @@ test("11·14. 고객 문의가 DB에 저장되고 상태 변경이 유지된다"
   await page.getByLabel("이름 *").fill(name);
   await page.getByLabel("전화번호 *").fill("+595 981 123 456");
   await page.getByLabel("이메일 (선택)").fill("cliente@example.com");
-  await page.getByLabel("희망 인수일").fill("2030-01-10");
+  await page.getByLabel("희망 렌트 시작일").fill("2030-01-10");
   await page.getByLabel("희망 반납일").fill("2030-01-05");
   await page.getByLabel("추가 문의사항").fill("월 렌탈 조건이 궁금합니다.");
   await page.getByLabel(/개인정보 수집·이용에 동의합니다/).check();
   await page.getByRole("button", { name: "문의 보내기" }).click();
-  await expect(page.getByText("희망 반납일은 희망 인수일 이후여야 합니다.")).toBeVisible();
+  await expect(page.getByText("희망 반납일은 희망 렌트 시작일 이후여야 합니다.")).toBeVisible();
   await page.getByLabel("희망 반납일").fill("2030-02-10");
   await page.getByRole("button", { name: "문의 보내기" }).click();
   await expect(page.getByTestId("inquiry-success")).toContainText("문의가 접수되었습니다");
@@ -270,22 +270,33 @@ test("11·14. 고객 문의가 DB에 저장되고 상태 변경이 유지된다"
   await expect(after.getByLabel("관리자 메모")).toHaveValue("전화 완료");
 });
 
-test("12. 모바일에서 비교표와 차량 페이지가 정상 표시된다", async ({ browser }) => {
+test("12. 모바일에서 비교표(차량별 열, 옆으로 스크롤)와 차량 페이지가 정상 표시된다", async ({ browser }) => {
   const ctx = await browser.newContext({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true });
   const page = await ctx.newPage();
   await page.goto("/vehiculos");
-  await expect(page.getByTestId("comparison-table")).toBeHidden();
-  const cards = page.getByTestId("comparison-cards");
-  await expect(cards).toBeVisible();
-  await expect(cards.getByRole("heading", { name: /Tucson 2026/ })).toBeVisible();
-  await expect(cards).toContainText("USD 1,210");
+  const table = page.getByTestId("comparison-table");
+  await expect(table).toBeVisible();
+  // 차량마다 한 열: 게시된 차량 수 + 항목 열
+  const cards = await page.getByTestId("vehicle-card").count();
+  await expect(table.locator("thead th")).toHaveCount(cards + 1);
+  await expect(table.locator("thead")).toContainText("Tucson 2026");
+  await expect(table).toContainText("USD 1,210");
+  // 표만 옆으로 스크롤되고 페이지 자체는 넘치지 않는다
+  const scroll = page.getByTestId("comparison-scroll");
+  const { sw, cw } = await scroll.evaluate((el) => ({ sw: el.scrollWidth, cw: el.clientWidth }));
+  expect(sw).toBeGreaterThan(cw);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
+  // 항목 열은 왼쪽에 고정
+  await scroll.evaluate((el) => el.scrollTo({ left: 400 }));
+  const labelBox = await table.locator("tbody th[scope=row]").first().boundingBox();
+  const scrollBox = await scroll.boundingBox();
+  expect(Math.abs((labelBox?.x ?? 0) - (scrollBox?.x ?? 0))).toBeLessThan(2);
+  await page.screenshot({ path: "test-results/mobile-compare.png", fullPage: false });
   await page.goto("/vehiculos/tivoli-2023");
   await expect(page.getByTestId("vehicle-main").getByTestId("price-total")).toBeVisible();
   const overflow2 = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow2).toBeLessThanOrEqual(0);
-  await page.screenshot({ path: "test-results/mobile-vehicle.png", fullPage: true });
   await ctx.close();
 });
 

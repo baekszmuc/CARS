@@ -228,7 +228,7 @@ export async function deletePhoto(photoId: string) {
   revalidatePath(`/admin/vehiculos/${photo.vehicle_id}`);
 }
 
-// ── 인수 체크리스트 ───────────────────────────────────────────────────────
+// ── 인도 체크리스트 ───────────────────────────────────────────────────────
 const checkSchema = z.object({
   vehicle_id: uuid,
   item_id: uuid,

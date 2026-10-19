@@ -68,6 +68,6 @@ export const getHandoverItems = cache(async (): Promise<HandoverItem[]> => {
     .eq("is_active", true)
     .order("category")
     .order("sort_order");
-  if (error) throw new Error(`인수 품목을 불러오지 못했습니다: ${error.message}`);
+  if (error) throw new Error(`렌트 시 제공 품목을 불러오지 못했습니다: ${error.message}`);
   return data as HandoverItem[];
 });

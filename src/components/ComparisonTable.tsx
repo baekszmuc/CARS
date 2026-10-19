@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { CopyLinkButton } from "./CopyLinkButton";
 import { WhatsAppButton } from "./WhatsAppButton";
+import { VehiclePhoto } from "./VehiclePhoto";
 import { serviceSummary } from "@/content/services";
+import { coverPhoto } from "@/lib/data";
 import { ko } from "@/i18n/ko";
 import { brandLabel, formatKm, formatMoney, priceBreakdown, specValue, vehicleTitle } from "@/lib/format";
 import { vehicleUrl, type SiteBase } from "@/lib/site-url";
@@ -76,8 +78,9 @@ export function ComparisonTable({
 
   const head = (v: Vehicle, i: number) => (
     <>
+      <VehiclePhoto photo={coverPhoto(v)} label={vehicleTitle(v)} className="mb-2 aspect-[4/3] bg-tile" sizes="(min-width: 768px) 25vw, 160px" />
       <span className="block text-[10px] font-bold tracking-[0.16em] text-steel">OPTION {String(i + 1).padStart(2, "0")}</span>
-      <span className="mt-1 block text-base font-bold">
+      <span className="mt-1 block text-sm font-semibold md:text-base">
         {brandLabel(v) && <span className="font-medium text-graphite">{brandLabel(v)} </span>}
         {vehicleTitle(v)}
       </span>
@@ -86,19 +89,20 @@ export function ComparisonTable({
 
   return (
     <div>
-      {/* 데스크톱: 표 */}
-      <div className="hidden overflow-x-auto bg-white md:block">
-        <table className="w-full table-fixed border-collapse text-left text-sm" data-testid="comparison-table">
+      {/* 한 표에서 차량마다 한 열. 모바일에서는 옆으로 밀어 비교하고, 항목 열은 왼쪽에 고정 */}
+      <p className="mb-2 text-[11px] text-graphite md:hidden" aria-hidden="true">← 옆으로 밀어서 차량을 비교하세요 →</p>
+      <div className="overflow-x-auto bg-white" data-testid="comparison-scroll">
+        <table className="w-full min-w-[34rem] table-fixed border-collapse text-left text-xs md:min-w-0 md:text-sm" data-testid="comparison-table">
           <caption className="sr-only">차량 비교표</caption>
           <colgroup>
-            <col className="w-48" />
+            <col className="w-24 md:w-48" />
             {vehicles.map((v) => <col key={v.id} />)}
           </colgroup>
           <thead>
-            <tr className="border-b border-silver bg-white">
-              <th scope="col" className="px-5 py-4 align-bottom text-xs font-semibold text-graphite">항목</th>
+            <tr className="border-b border-silver">
+              <th scope="col" className="sticky left-0 z-10 border-r border-cloud bg-white px-3 py-3 align-bottom text-[11px] font-semibold text-graphite md:px-5 md:py-4">항목</th>
               {vehicles.map((v, i) => (
-                <th key={v.id} scope="col" className="px-5 py-4 align-bottom">{head(v, i)}</th>
+                <th key={v.id} scope="col" className="px-3 py-3 align-bottom md:px-5 md:py-4">{head(v, i)}</th>
               ))}
             </tr>
           </thead>
@@ -108,15 +112,17 @@ export function ComparisonTable({
             return (
               <tbody key={g.key}>
                 <tr className="bg-mist">
-                  <th scope="rowgroup" colSpan={vehicles.length + 1} className="px-5 py-2 text-[10px] font-bold tracking-[0.12em] text-steel">
-                    {g.title}
+                  <th scope="rowgroup" colSpan={vehicles.length + 1} className="p-0 text-left">
+                    <span className="sticky left-0 inline-block px-3 py-2 text-[10px] font-bold tracking-[0.12em] text-steel md:px-5">
+                      {g.title}
+                    </span>
                   </th>
                 </tr>
                 {list.map((r) => (
                   <tr key={r.label} className="border-t border-silver">
-                    <th scope="row" className="px-5 py-3 font-medium text-graphite">{r.label}</th>
+                    <th scope="row" className="sticky left-0 z-10 border-r border-cloud bg-white px-3 py-2.5 font-medium text-graphite md:px-5 md:py-3">{r.label}</th>
                     {vehicles.map((v) => (
-                      <td key={v.id} className={`px-5 py-3 tabular-nums ${r.strong ? "text-base font-semibold" : "font-normal"}`}>
+                      <td key={v.id} className={`px-3 py-2.5 align-top tabular-nums md:px-5 md:py-3 ${r.strong ? "text-sm font-semibold md:text-base" : "font-normal"}`}>
                         {r.value(v)}
                       </td>
                     ))}
@@ -127,40 +133,13 @@ export function ComparisonTable({
           })}
           <tbody>
             <tr className="border-t border-silver">
-              <th scope="row" className="px-5 py-4 font-medium text-graphite">바로가기</th>
+              <th scope="row" className="sticky left-0 z-10 border-r border-cloud bg-white px-3 py-3 font-medium text-graphite md:px-5 md:py-4">바로가기</th>
               {vehicles.map((v) => (
-                <td key={v.id} className="px-5 py-4 align-top">{actions(v)}</td>
+                <td key={v.id} className="px-3 py-3 align-top md:px-5 md:py-4">{actions(v)}</td>
               ))}
             </tr>
           </tbody>
         </table>
-      </div>
-
-      {/* 모바일: 카드 */}
-      <div className="grid gap-4 md:hidden" data-testid="comparison-cards">
-        {vehicles.map((v, i) => (
-          <section key={v.id} className="overflow-hidden bg-white" aria-label={vehicleTitle(v)}>
-            <h3 className="border-b border-silver bg-white px-4 py-3">{head(v, i)}</h3>
-            {groups.map((g) => {
-              const list = rows.filter((r) => r.group === g.key);
-              if (list.length === 0) return null;
-              return (
-                <div key={g.key}>
-                  <p className="bg-mist px-4 py-1.5 text-[10px] font-bold tracking-[0.12em] text-steel">{g.title}</p>
-                  <dl className="divide-y divide-silver text-sm">
-                    {list.map((r) => (
-                      <div key={r.label} className="flex justify-between gap-4 px-4 py-2.5">
-                        <dt className="shrink-0 text-graphite">{r.label}</dt>
-                        <dd className={`text-right tabular-nums ${r.strong ? "font-bold" : "font-medium"}`}>{r.value(v)}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-              );
-            })}
-            <div className="border-t border-silver p-4">{actions(v)}</div>
-          </section>
-        ))}
       </div>
       <p className="mt-3 text-xs text-graphite">
         사양은 공개 자료 기준 참고 정보이며 차량별로 확인이 필요합니다. &lsquo;—&rsquo; 는 확인된 정보가 없는 항목입니다.

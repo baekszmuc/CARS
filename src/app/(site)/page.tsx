@@ -85,12 +85,12 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 4. 인수 품목 */}
+      {/* 4. 렌트 시 제공 품목 */}
       <section className="container-page pb-16" aria-labelledby="handover">
         <SectionHeading
           id="handover"
           eyebrow="Entrega"
-          title="차량 인수 시 함께 제공되는 항목"
+          title="차량 렌트 시 함께 제공되는 항목"
           description="실제 제공 여부는 계약 및 차량별 확인 사항에 따릅니다."
         />
         <HandoverList items={handover} />

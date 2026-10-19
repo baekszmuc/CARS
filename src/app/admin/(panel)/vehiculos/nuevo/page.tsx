@@ -14,7 +14,7 @@ export default async function NewVehiclePage() {
   return (
     <div className="max-w-3xl">
       <PageTitle title="차량 추가" />
-      <Panel description="등록 후 사진 업로드, 인수 체크리스트를 이어서 설정할 수 있습니다.">
+      <Panel description="등록 후 사진 업로드, 인도 체크리스트를 이어서 설정할 수 있습니다.">
         <VehicleForm
           action={createVehicle}
           defaults={{ iva_rate: Number(settings.default_iva_rate), iva_applies: settings.default_iva_applies }}

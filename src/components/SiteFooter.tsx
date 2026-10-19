@@ -20,7 +20,7 @@ export function SiteFooter({ settings }: { settings: Settings }) {
               <li><Link className="hover:text-silver" href="/vehiculos">차량 카탈로그</Link></li>
               <li><Link className="hover:text-silver" href="/vehiculos#comparar">차량 비교</Link></li>
               <li><Link className="hover:text-silver" href="/servicios">포함 서비스</Link></li>
-              <li><Link className="hover:text-silver" href="/incluye">인수 품목</Link></li>
+              <li><Link className="hover:text-silver" href="/incluye">렌트 시 제공 품목</Link></li>
             </ul>
           </nav>
           <div>

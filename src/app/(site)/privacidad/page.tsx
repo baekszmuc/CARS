@@ -22,7 +22,7 @@ export default async function PrivacyPage() {
             <p className="mt-2">{s.business_name}은(는) 렌탈 문의 양식을 통해 다음 정보를 수집합니다.</p>
             <ul>
               <li>필수: 이름, 전화번호</li>
-              <li>선택: 이메일, 관심 차량, 희망 인수일·반납일, 추가 문의사항</li>
+              <li>선택: 이메일, 관심 차량, 희망 렌트 시작일·반납일, 추가 문의사항</li>
             </ul>
           </section>
           <section>

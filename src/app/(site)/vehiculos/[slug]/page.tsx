@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     p.ivaApplies ? `IVA 포함 ${formatMoney(p.total, settings.currency)} ${per}` : null,
     formatKm(vehicle.mileage_km) ? `주행거리 ${formatKm(vehicle.mileage_km)}` : null,
   ].filter(Boolean);
-  const description = `${settings.business_name} ${title} 렌탈 — ${parts.join(" · ")}. 정비·보험 포함 서비스와 인수 품목을 확인하세요.`;
+  const description = `${settings.business_name} ${title} 렌탈 — ${parts.join(" · ")}. 정비·보험 포함 서비스와 렌트 시 제공 품목을 확인하세요.`;
   const cover = coverPhoto(vehicle);
   const images = [
     cover

@@ -47,7 +47,7 @@ export const inquirySchema = z
   })
   .refine((d) => !d.pickup_date || !d.return_date || d.return_date >= d.pickup_date, {
     path: ["return_date"],
-    message: "희망 반납일은 희망 인수일 이후여야 합니다.",
+    message: "희망 반납일은 희망 렌트 시작일 이후여야 합니다.",
   });
 
 export type FieldErrors = Partial<Record<string, string>>;
