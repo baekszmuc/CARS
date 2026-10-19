@@ -33,15 +33,15 @@ export default async function ContactPage({ searchParams }: Props) {
         }
       />
       <div className="container-page grid gap-12 py-14 lg:grid-cols-[1.6fr_1fr]">
-        <InquiryForm vehicles={options} selectedSlug={vehiculo} />
+        <div className="bg-white p-6 sm:p-8"><InquiryForm vehicles={options} selectedSlug={vehiculo} /></div>
         <aside className="space-y-6">
-          <div className="rounded-lg border border-silver p-6">
+          <div className="bg-white p-6">
             <h2 className="text-lg font-bold">WhatsApp 상담</h2>
             <div className="mt-4">
               <WhatsAppButton number={settings.whatsapp_number} message={buildGeneralInquiryMessage(settings)} />
             </div>
           </div>
-          <div className="rounded-lg border border-silver p-6">
+          <div className="bg-white p-6">
             <h2 className="text-lg font-bold">연락처</h2>
             <dl className="mt-4 space-y-3 text-sm">
               <div>

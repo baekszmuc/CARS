@@ -6,7 +6,7 @@ import { resolveSiteBase } from "@/lib/site-url";
 import type { HandoverItem, Settings, Vehicle, VehiclePhoto } from "@/lib/types";
 
 const VEHICLE_FIELDS =
-  "id, slug, name, brand, variant, specs, spec_note, model_year, mileage_km, base_price, iva_applies, iva_rate, iva_amount, total_price, billing_unit, status, description, is_published, is_archived, sort_order, created_at, updated_at, vehicle_photos(id, vehicle_id, storage_path, alt, sort_order, is_cover, created_at)";
+  "id, slug, name, brand, variant, specs, spec_note, model_year, mileage_km, base_price, iva_applies, iva_rate, iva_amount, total_price, billing_unit, status, description, is_published, is_archived, sort_order, created_at, updated_at, vehicle_photos(id, vehicle_id, storage_path, alt, sort_order, is_cover, is_reference, created_at)";
 
 export { VEHICLE_FIELDS };
 

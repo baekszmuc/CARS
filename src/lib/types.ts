@@ -12,6 +12,7 @@ export interface VehiclePhoto {
   alt: string | null;
   sort_order: number;
   is_cover: boolean;
+  is_reference: boolean;
   created_at: string;
 }
 

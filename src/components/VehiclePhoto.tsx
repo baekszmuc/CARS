@@ -3,6 +3,14 @@ import { PhotoPlaceholder } from "./PhotoPlaceholder";
 import { photoUrl } from "@/lib/data";
 import type { VehiclePhoto as Photo } from "@/lib/types";
 
+export function ReferenceBadge() {
+  return (
+    <span className="absolute bottom-2 left-2 rounded bg-obsidian/80 px-2 py-0.5 text-[10px] font-semibold text-white">
+      참고 이미지
+    </span>
+  );
+}
+
 export function VehiclePhoto({
   photo,
   label,
@@ -27,6 +35,7 @@ export function VehiclePhoto({
         priority={priority}
         className="object-cover"
       />
+      {photo.is_reference && <ReferenceBadge />}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import type { Settings } from "@/lib/types";
 
 function Card({ n, title, children }: { n: string; title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border border-silver bg-white p-6" aria-labelledby={`svc-${n}`}>
+    <section className="bg-white p-6" aria-labelledby={`svc-${n}`}>
       <p className="text-xs font-bold tracking-widest text-steel">{n}</p>
       <h3 id={`svc-${n}`} className="mt-1 text-lg font-bold">
         {title}

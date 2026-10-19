@@ -11,15 +11,15 @@ import { VehiclePhoto } from "./VehiclePhoto";
 import { WhatsAppButton } from "./WhatsAppButton";
 import { ko } from "@/i18n/ko";
 import { photoUrl, sortPhotos } from "@/lib/data";
-import { billingUnitLabel, brandLabel, formatKm, vehicleTitle } from "@/lib/format";
+import { billingUnitLabel, brandLabel, formatKm, specValue, vehicleTitle } from "@/lib/format";
 import { buildVehicleInquiryMessage, whatsappShareLink } from "@/lib/whatsapp";
 import type { HandoverItem, Settings, Vehicle } from "@/lib/types";
 
 function Block({ n, title, id, children }: { n: string; title: string; id: string; children: React.ReactNode }) {
   return (
-    <section className="border-t border-silver pt-10" aria-labelledby={id}>
-      <p className="text-[10px] font-bold tracking-[0.16em] text-steel">{n}</p>
-      <h2 id={id} className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">{title}</h2>
+    <section aria-labelledby={id}>
+      <p className="text-[10px] tracking-[0.16em] text-steel">{n}</p>
+      <h2 id={id} className="mt-1 text-xl font-normal tracking-tight sm:text-2xl">{title}</h2>
       <div className="mt-6">{children}</div>
     </section>
   );
@@ -42,6 +42,15 @@ export function VehicleDetail({
   const brand = brandLabel(vehicle);
   const photos = sortPhotos(vehicle.vehicle_photos);
   const message = buildVehicleInquiryMessage(vehicle, settings, url);
+  const short = (v: string | null) => (v ? v.replace(/\s*\(.*\)\s*/g, "").split(" · ")[0] : null);
+  const stats = [
+    { label: ko.common.year, value: vehicle.model_year ? String(vehicle.model_year) : ko.common.pending },
+    { label: ko.common.mileage, value: formatKm(vehicle.mileage_km) ?? ko.common.pending },
+    { label: "출력", value: short(specValue(vehicle, "출력")) ?? ko.common.pending },
+  ];
+  const highlights = ["변속기", "연료", "구동 방식", "승차 정원"]
+    .map((label) => ({ label, value: short(specValue(vehicle, label)) }))
+    .filter((h): h is { label: string; value: string } => Boolean(h.value));
   const basics = [
     { label: ko.common.year, value: vehicle.model_year ? String(vehicle.model_year) : ko.common.pending },
     { label: ko.common.mileage, value: formatKm(vehicle.mileage_km) ?? ko.common.pending },
@@ -56,33 +65,25 @@ export function VehicleDetail({
         <span className="text-obsidian">{title}</span>
       </nav>
 
-      {/* 1·2. 차량명 + 사진 / 가격 */}
-      <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:gap-12">
-        <div>
-          {photos.length > 1 ? (
-            <VehicleGallery photos={photos.map((p) => ({ id: p.id, url: photoUrl(p), alt: p.alt || title }))} />
-          ) : (
-            <VehiclePhoto photo={photos[0] ?? null} label={title} className="aspect-[16/10] rounded-xl" priority sizes="(min-width: 1024px) 60vw, 100vw" />
-          )}
-        </div>
-
-        <div className="lg:sticky lg:top-20 lg:self-start" data-testid="vehicle-main">
+      {/* 1·2. 차량명 · 가격 · 주요 수치 (Aevum 제품 상단 구성) */}
+      <div className="grid gap-8 bg-white p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+        <div data-testid="vehicle-main">
           <div className="flex items-center gap-3">
-            {brand && <p className="text-[10px] font-bold tracking-[0.16em] text-steel">{brand.toUpperCase()}</p>}
+            {brand && <p className="text-[10px] font-medium tracking-[0.18em] text-steel">{brand.toUpperCase()}</p>}
             <StatusBadge status={vehicle.status} />
           </div>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl" data-testid="vehicle-title">{title}</h1>
-          {vehicle.variant && <p className="mt-1 text-graphite">{vehicle.variant}</p>}
+          <h1 className="mt-1 text-3xl font-normal tracking-tight sm:text-4xl" data-testid="vehicle-title">{title}</h1>
+          {vehicle.variant && <p className="mt-1 text-sm text-graphite">{vehicle.variant}</p>}
 
-          <div className="mt-5">
+          <div className="mt-6 max-w-md">
             <PriceBlock vehicle={vehicle} currency={settings.currency} size="lg" />
             {!settings.iva_verified && (
-              <p className="mt-2 text-xs text-graphite">세금(IVA) 적용 방식은 계약 시 최종 확인됩니다.</p>
+              <p className="mt-2 text-[11px] text-graphite">세금(IVA) 적용 방식은 계약 시 최종 확인됩니다.</p>
             )}
           </div>
 
-          <div className="mt-4 grid gap-2">
-            <WhatsAppButton number={settings.whatsapp_number} message={message} />
+          <div className="mt-5 flex max-w-md flex-col gap-2">
+            <WhatsAppButton number={settings.whatsapp_number} message={message} className="btn btn-primary" />
             <Link href={`/contacto?vehiculo=${vehicle.slug}`} className="btn btn-outline">렌탈 문의하기</Link>
           </div>
 
@@ -94,25 +95,61 @@ export function VehicleDetail({
             </a>
             <ShareButton url={url} title={`${title} | ${settings.business_name}`} />
           </div>
-          <p className="mt-4 text-xs leading-relaxed text-graphite">{ko.availabilityNotice}</p>
+          <p className="mt-4 max-w-md text-[11px] leading-relaxed text-graphite">{ko.availabilityNotice}</p>
+        </div>
+
+        <div className="order-first min-w-0 lg:order-none">
+          <dl className="mb-4 grid grid-cols-3 gap-2">
+            {stats.map((s) => (
+              <div key={s.label} className="bg-cloud px-3 py-2.5">
+                <dt className="text-[10px] text-graphite">{s.label}</dt>
+                <dd className="mt-1 truncate text-sm font-medium" title={s.value}>{s.value}</dd>
+              </div>
+            ))}
+          </dl>
+          {photos.length > 1 ? (
+            <VehicleGallery photos={photos.map((p) => ({ id: p.id, url: photoUrl(p), alt: p.alt || title, isReference: p.is_reference }))} />
+          ) : (
+            <VehiclePhoto photo={photos[0] ?? null} label={title} className="aspect-[16/10]" priority sizes="(min-width: 1024px) 55vw, 100vw" />
+          )}
+          {photos.some((p) => p.is_reference) && (
+            <p className="mt-2 text-[11px] text-graphite" data-testid="reference-note">
+              &lsquo;참고 이미지&rsquo; 표시가 있는 사진은 동일 모델의 참고 이미지이며, 실제 렌탈 차량과 색상·사양이 다를 수 있습니다.
+            </p>
+          )}
         </div>
       </div>
+
+      {/* 주요 사양 하이라이트 (Aevum "Product Highlight") */}
+      {highlights.length > 0 && (
+        <section className="mt-4" aria-labelledby="highlight">
+          <h2 id="highlight" className="sr-only">주요 사양</h2>
+          <dl className="grid grid-cols-2 gap-2 md:grid-cols-4">
+            {highlights.map((h) => (
+              <div key={h.label} className="bg-white px-4 py-4">
+                <dt className="text-[10px] text-graphite">{h.label}</dt>
+                <dd className="mt-1.5 text-sm font-medium">{h.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
 
       <div className="mt-14 grid gap-14">
         {/* 3. 사양 */}
         <Block n="01" title="차량 사양" id="spec">
-          <dl className="grid overflow-hidden rounded-xl border border-silver sm:grid-cols-2">
+          <dl className="grid gap-x-12 bg-white px-6 py-2 sm:grid-cols-2">
             {[...basics, ...(vehicle.specs ?? [])].map((s) => (
-              <div key={s.label} className="flex justify-between gap-6 border-b border-silver px-5 py-3 text-sm sm:odd:border-r">
-                <dt className="shrink-0 text-graphite">{s.label}</dt>
-                <dd className="text-right font-medium">{s.value}</dd>
+              <div key={s.label} className="flex justify-between gap-6 border-b border-cloud py-3 text-sm">
+                <dt className="shrink-0 text-xs text-graphite">{s.label}</dt>
+                <dd className="text-right">{s.value}</dd>
               </div>
             ))}
           </dl>
-          <p className="mt-3 text-xs text-graphite">
+          <p className="mt-3 text-[11px] text-graphite">
             {vehicle.spec_note ?? "사양 정보는 확인되는 대로 추가됩니다."}
           </p>
-          {vehicle.description && <p className="mt-4 whitespace-pre-line leading-relaxed text-charcoal">{vehicle.description}</p>}
+          {vehicle.description && <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-charcoal">{vehicle.description}</p>}
         </Block>
 
         {/* 4. 정비·교체 */}
@@ -144,8 +181,8 @@ export function VehicleDetail({
         </Block>
 
         {/* 7. 문의 */}
-        <section className="rounded-xl bg-obsidian p-8 text-white sm:p-10" aria-labelledby="cta">
-          <h2 id="cta" className="text-2xl font-bold tracking-tight">{title} 렌탈 문의</h2>
+        <section className="bg-obsidian p-8 text-white sm:p-10" aria-labelledby="cta">
+          <h2 id="cta" className="text-2xl font-medium tracking-tight">{title} 렌탈 문의</h2>
           <p className="mt-2 max-w-xl text-sm text-silver">
             희망 일정을 알려 주시면 이용 가능 여부와 렌탈 조건을 안내드립니다. 문의만으로 예약이 확정되지는 않습니다.
           </p>

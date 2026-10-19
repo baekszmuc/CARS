@@ -27,7 +27,7 @@ export function InquiryForm({ vehicles, selectedSlug }: { vehicles: Option[]; se
 
   if (state.ok) {
     return (
-      <div className="rounded-lg border border-silver bg-mist p-6" role="status" data-testid="inquiry-success">
+      <div className="bg-cloud p-6" role="status" data-testid="inquiry-success">
         <h2 className="text-lg font-bold">문의가 접수되었습니다.</h2>
         <p className="mt-2 text-sm leading-relaxed text-charcoal">
           담당자가 내용을 확인한 뒤 남겨 주신 연락처로 안내드립니다. {ko.availabilityNotice}

@@ -87,7 +87,7 @@ export function ComparisonTable({
   return (
     <div>
       {/* 데스크톱: 표 */}
-      <div className="hidden overflow-x-auto rounded-xl border border-silver md:block">
+      <div className="hidden overflow-x-auto bg-white md:block">
         <table className="w-full table-fixed border-collapse text-left text-sm" data-testid="comparison-table">
           <caption className="sr-only">차량 비교표</caption>
           <colgroup>
@@ -116,7 +116,7 @@ export function ComparisonTable({
                   <tr key={r.label} className="border-t border-silver">
                     <th scope="row" className="px-5 py-3 font-medium text-graphite">{r.label}</th>
                     {vehicles.map((v) => (
-                      <td key={v.id} className={`px-5 py-3 tabular-nums ${r.strong ? "text-lg font-bold" : "font-medium"}`}>
+                      <td key={v.id} className={`px-5 py-3 tabular-nums ${r.strong ? "text-base font-semibold" : "font-normal"}`}>
                         {r.value(v)}
                       </td>
                     ))}
@@ -139,7 +139,7 @@ export function ComparisonTable({
       {/* 모바일: 카드 */}
       <div className="grid gap-4 md:hidden" data-testid="comparison-cards">
         {vehicles.map((v, i) => (
-          <section key={v.id} className="overflow-hidden rounded-xl border border-silver" aria-label={vehicleTitle(v)}>
+          <section key={v.id} className="overflow-hidden bg-white" aria-label={vehicleTitle(v)}>
             <h3 className="border-b border-silver bg-white px-4 py-3">{head(v, i)}</h3>
             {groups.map((g) => {
               const list = rows.filter((r) => r.group === g.key);

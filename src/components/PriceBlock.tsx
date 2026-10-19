@@ -20,14 +20,14 @@ export function PriceBlock({
   const per = ko.billingUnitPer[p.unit];
   const big = size === "lg";
   return (
-    <div className={`rounded-lg bg-mist ${big ? "p-5" : "p-4"}`}>
-      <p className="text-xs font-semibold text-graphite">
+    <div className={`border-t border-silver ${big ? "pt-5" : "pt-4"}`}>
+      <p className="text-[11px] text-graphite">
         최종 {unit} 렌트료{p.ivaApplies ? " · IVA 포함" : ""}
       </p>
       <p className={`mt-1 tabular-nums ${big ? "price-final sm:text-4xl" : "price-final"}`} data-testid="price-total">
-        {formatMoney(p.total, currency)} <span className="text-sm font-medium text-graphite">{per}</span>
+        {formatMoney(p.total, currency)} <span className="text-sm font-normal text-graphite">{per}</span>
       </p>
-      <dl className={`mt-3 grid gap-1 border-t border-silver pt-3 ${big ? "text-sm" : "text-xs"}`}>
+      <dl className={`mt-3 grid gap-1 rounded bg-cloud px-3 py-2.5 ${big ? "text-sm" : "text-xs"}`}>
         <div className="flex justify-between gap-3">
           <dt className="text-graphite">기본 {unit} 렌트료</dt>
           <dd className="font-semibold tabular-nums" data-testid="price-base">

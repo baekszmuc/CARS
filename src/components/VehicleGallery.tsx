@@ -6,6 +6,7 @@ export interface GalleryPhoto {
   id: string;
   url: string;
   alt: string;
+  isReference: boolean;
 }
 
 /** 대표 사진 + 썸네일 선택 갤러리 (사진이 2장 이상일 때 사용) */
@@ -24,6 +25,11 @@ export function VehicleGallery({ photos }: { photos: GalleryPhoto[] }) {
           sizes="(min-width: 1024px) 60vw, 100vw"
           className="object-cover"
         />
+        {current.isReference && (
+          <span className="absolute bottom-2 left-2 rounded bg-obsidian/80 px-2 py-0.5 text-[10px] font-semibold text-white">
+            참고 이미지
+          </span>
+        )}
       </div>
       <ul className="mt-3 grid grid-cols-4 gap-3" aria-label="사진 선택">
         {photos.map((p, i) => (

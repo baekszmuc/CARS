@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { getBrowserClient } from "@/lib/supabase/browser";
 import { PHOTO_BUCKET, publicStorageUrl } from "@/lib/env";
 import type { VehiclePhoto } from "@/lib/types";
-import { deletePhoto, movePhoto, registerPhoto, setCoverPhoto, updatePhotoAlt } from "@/app/admin/(panel)/actions";
+import { deletePhoto, movePhoto, registerPhoto, setCoverPhoto, setPhotoReference, updatePhotoAlt } from "@/app/admin/(panel)/actions";
 
 const ALLOWED: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -99,6 +99,9 @@ export function PhotoManager({ vehicleId, photos }: { vehicleId: string; photos:
             <li key={p.id} className="overflow-hidden rounded-lg border border-silver">
               <div className="relative aspect-[4/3] bg-silver">
                 <img src={publicStorageUrl(PHOTO_BUCKET, p.storage_path)} alt={p.alt ?? ""} className="h-full w-full object-cover" />
+                {p.is_reference && (
+                  <span className="absolute bottom-2 left-2 rounded bg-obsidian/80 px-2 py-0.5 text-xs font-semibold text-white">참고 이미지</span>
+                )}
                 {p.is_cover && (
                   <span className="absolute left-2 top-2 rounded bg-obsidian px-2 py-0.5 text-xs font-semibold text-white">대표 사진</span>
                 )}
@@ -112,6 +115,17 @@ export function PhotoManager({ vehicleId, photos }: { vehicleId: string; photos:
                   maxLength={200}
                   onBlur={(e) => e.target.value !== (p.alt ?? "") && run(() => updatePhotoAlt(p.id, e.target.value))}
                 />
+                <label className="flex items-center gap-2 text-xs">
+                  <input
+                    key={`${p.id}-${p.is_reference}`}
+                    type="checkbox"
+                    className="h-4 w-4"
+                    defaultChecked={p.is_reference}
+                    disabled={pending}
+                    onChange={(e) => run(() => setPhotoReference(p.id, e.target.checked))}
+                  />
+                  참고 이미지 (실제 렌탈 차량이 아닌 동일 모델 사진)
+                </label>
                 <div className="flex flex-wrap gap-1.5">
                   <button type="button" className="btn btn-outline btn-sm" disabled={pending || i === 0} onClick={() => run(() => movePhoto(p.id, "up"))} aria-label="앞으로 이동">←</button>
                   <button type="button" className="btn btn-outline btn-sm" disabled={pending || i === sorted.length - 1} onClick={() => run(() => movePhoto(p.id, "down"))} aria-label="뒤로 이동">→</button>

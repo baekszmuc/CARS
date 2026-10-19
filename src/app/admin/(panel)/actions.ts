@@ -199,6 +199,15 @@ export async function updatePhotoAlt(photoId: string, alt: string) {
   revalidatePath(`/admin/vehiculos/${photo.vehicle_id}`);
 }
 
+export async function setPhotoReference(photoId: string, isReference: boolean) {
+  const { supabase } = await requireAdmin();
+  const photo = await photoVehicle(supabase, photoId);
+  const { error } = await supabase.from("vehicle_photos").update({ is_reference: isReference }).eq("id", photoId);
+  if (error) throw new Error(dbMessage(error));
+  refreshPublic();
+  revalidatePath(`/admin/vehiculos/${photo.vehicle_id}`);
+}
+
 export async function deletePhoto(photoId: string) {
   const { supabase } = await requireAdmin();
   const photo = await photoVehicle(supabase, photoId);

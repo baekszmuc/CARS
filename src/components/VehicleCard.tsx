@@ -7,8 +7,10 @@ import { coverPhoto } from "@/lib/data";
 import { brandLabel, formatKm, specValue, vehicleTitle } from "@/lib/format";
 import type { Vehicle } from "@/lib/types";
 
-/** 카드에 요약 표시할 사양 (있는 것만) */
-const CARD_SPECS = ["엔진", "변속기", "연료"];
+/** 카드 사양 줄: 짧은 값만 (괄호 안 설명은 상세 페이지에서) */
+function short(value: string | null): string | null {
+  return value ? value.replace(/\s*\(.*\)\s*/g, "").split(" · ")[0] : null;
+}
 
 export function VehicleCard({
   vehicle,
@@ -21,44 +23,42 @@ export function VehicleCard({
 }) {
   const title = vehicleTitle(vehicle);
   const brand = brandLabel(vehicle);
-  const specs = CARD_SPECS.map((l) => [l, specValue(vehicle, l)] as const).filter(([, v]) => v);
+  const facts = [
+    vehicle.model_year ? String(vehicle.model_year) : null,
+    formatKm(vehicle.mileage_km),
+    short(specValue(vehicle, "변속기")),
+    short(specValue(vehicle, "연료")),
+  ].filter(Boolean) as string[];
+
   return (
-    <article className="flex h-full flex-col overflow-hidden rounded-xl border border-silver bg-white" data-testid="vehicle-card">
-      <Link href={`/vehiculos/${vehicle.slug}`} tabIndex={-1} aria-hidden="true">
-        <VehiclePhoto photo={coverPhoto(vehicle)} label={title} className="aspect-[16/10]" />
+    <article className="group flex h-full flex-col bg-white" data-testid="vehicle-card">
+      <Link href={`/vehiculos/${vehicle.slug}`} tabIndex={-1} aria-hidden="true" className="block overflow-hidden">
+        <VehiclePhoto
+          photo={coverPhoto(vehicle)}
+          label={title}
+          className="aspect-[4/3] bg-tile transition-transform duration-300 group-hover:scale-[1.015] motion-reduce:transition-none"
+        />
       </Link>
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-[10px] font-bold tracking-[0.16em] text-steel">
+          <p className="text-[10px] font-medium tracking-[0.16em] text-steel">
             {index !== undefined ? `OPTION ${String(index + 1).padStart(2, "0")}` : brand?.toUpperCase()}
           </p>
           <StatusBadge status={vehicle.status} />
         </div>
-        <h3 className="mt-2 text-xl font-bold tracking-tight">
-          {brand && <span className="font-medium text-graphite">{brand} </span>}
+        <h3 className="mt-1.5 text-lg font-medium tracking-tight">
+          {brand && <span className="text-graphite">{brand} </span>}
           {title}
         </h3>
-        {vehicle.variant && <p className="mt-0.5 text-sm text-graphite">{vehicle.variant}</p>}
-
-        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 border-y border-silver py-3 text-xs">
-          <div>
-            <dt className="text-graphite">{ko.common.year}</dt>
-            <dd className="font-semibold">{vehicle.model_year ?? ko.common.pending}</dd>
-          </div>
-          <div>
-            <dt className="text-graphite">{ko.common.mileage}</dt>
-            <dd className="font-semibold">{formatKm(vehicle.mileage_km) ?? ko.common.pending}</dd>
-          </div>
-          {specs.map(([label, value]) => (
-            <div key={label} className="col-span-2">
-              <dt className="sr-only">{label}</dt>
-              <dd className="truncate text-charcoal" title={`${label}: ${value}`}>
-                <span className="text-graphite">{label}</span> · {value}
-              </dd>
-            </div>
+        {vehicle.variant && <p className="text-xs text-graphite">{vehicle.variant}</p>}
+        <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-charcoal" aria-label="주요 정보">
+          {facts.map((f, i) => (
+            <span key={f} className="flex items-center gap-2">
+              {i > 0 && <span aria-hidden="true" className="h-3 w-px bg-silver" />}
+              {f}
+            </span>
           ))}
-        </dl>
-
+        </p>
         <div className="mt-4 flex-1">
           <PriceBlock vehicle={vehicle} currency={currency} />
         </div>

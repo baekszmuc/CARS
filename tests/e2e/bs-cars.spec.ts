@@ -218,12 +218,18 @@ test("10. 사진 업로드가 정상 작동한다", async ({ page }) => {
   await page.getByRole("button", { name: "앞으로 이동" }).nth(1).click();
   await expect(page.getByTestId("photo-list").locator("li").nth(0).getByText("대표 사진", { exact: true })).toBeVisible();
 
+  // 참고 이미지 표시
+  await page.getByTestId("photo-list").locator("li").first().getByLabel(/참고 이미지/).check();
+  await expect(page.getByTestId("photo-list").locator("li").first().getByLabel(/참고 이미지/)).toBeChecked();
+
   // 고객 페이지에 실제 사진 표시
   await page.goto(`/vehiculos/${testVehicleSlug}`);
   const img = page.locator("article img").first();
   await expect(img).toBeVisible();
   const ok = await img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0);
   expect(ok).toBeTruthy();
+  await expect(page.getByTestId("reference-note")).toBeVisible();
+  await expect(page.getByText("참고 이미지", { exact: true }).first()).toBeVisible();
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", /storage\/v1\/object\/public\/vehicle-photos\//);
 });
 
