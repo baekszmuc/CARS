@@ -2,8 +2,9 @@ import Link from "next/link";
 import { PriceBlock } from "./PriceBlock";
 import { StatusBadge } from "./StatusBadge";
 import { VehiclePhoto } from "./VehiclePhoto";
-import { ko } from "@/i18n/ko";
-import { coverPhoto } from "@/lib/data";
+import { coverPhoto, getSettings, getSiteBase } from "@/lib/data";
+import { vehicleUrl } from "@/lib/site-url";
+import { OptionInquiryButton } from "./OptionInquiryButton";
 import { brandLabel, formatKm, specValue, vehicleTitle } from "@/lib/format";
 import type { Vehicle } from "@/lib/types";
 
@@ -12,7 +13,7 @@ function short(value: string | null): string | null {
   return value ? value.replace(/\s*\(.*\)\s*/g, "").split(" · ")[0] : null;
 }
 
-export function VehicleCard({
+export async function VehicleCard({
   vehicle,
   currency,
   index,
@@ -21,6 +22,7 @@ export function VehicleCard({
   currency: string;
   index?: number;
 }) {
+  const [settings, base] = await Promise.all([getSettings(), getSiteBase()]);
   const title = vehicleTitle(vehicle);
   const brand = brandLabel(vehicle);
   const facts = [
@@ -63,8 +65,8 @@ export function VehicleCard({
           <PriceBlock vehicle={vehicle} currency={currency} />
         </div>
         <div className="mt-4 grid grid-cols-2 gap-2">
-          <Link href={`/vehiculos/${vehicle.slug}`} className="btn btn-primary btn-sm">상세 정보</Link>
-          <Link href={`/contacto?vehiculo=${vehicle.slug}`} className="btn btn-outline btn-sm">{ko.common.inquire}</Link>
+          <OptionInquiryButton vehicle={vehicle} settings={settings} url={vehicleUrl(base, vehicle.slug)} className="btn btn-primary btn-sm px-2" />
+          <Link href={`/vehiculos/${vehicle.slug}`} className="btn btn-outline btn-sm">상세 정보</Link>
         </div>
       </div>
     </article>

@@ -151,10 +151,26 @@ test("6. 링크 복사 버튼이 정상 작동한다", async ({ page, context })
 });
 
 test("7. WhatsApp 메시지에 올바른 차량 정보와 링크가 들어간다", async ({ page }) => {
-  // 번호 미등록 상태: 잘못된 링크 대신 안내 문구
+  const expected = (url: string) =>
+    [
+      "안녕하세요. BS CARS 차량 렌탈에 대해 문의드립니다.",
+      "관심 차량: Kia Seltos 2027",
+      "월 렌트료: USD 900 + IVA",
+      "IVA 포함 가격: USD 990",
+      "차량의 이용 가능 여부와 렌탈 조건을 안내해 주실 수 있을까요?",
+      `차량 상세 링크: ${url}`,
+    ].join("\n");
+  // 번호 미등록: "이 옵션 문의하기"가 받는 사람을 고르는 WhatsApp 메시지로 열린다
   await page.goto("/vehiculos/kia-seltos");
-  await expect(page.getByTestId("vehicle-main").getByTestId("whatsapp-missing")).toBeVisible();
-  await expect(page.getByTestId("vehicle-main").getByTestId("whatsapp-link")).toHaveCount(0);
+  const btn0 = page.getByTestId("vehicle-main").getByTestId("option-inquiry");
+  await expect(btn0).toHaveText(/이 옵션 문의하기/);
+  const href0 = await btn0.getAttribute("href");
+  expect(href0).toMatch(/^https:\/\/wa\.me\/\?text=/);
+  expect(decodeURIComponent(href0!.split("?text=")[1])).toBe(expected("http://localhost:3000/vehiculos/kia-seltos"));
+  // 카탈로그 카드의 버튼도 차량별 메시지
+  await page.goto("/vehiculos");
+  const cardHref = await (await cardFor(page, "Tucson 2026")).getByTestId("option-inquiry").getAttribute("href");
+  expect(decodeURIComponent(cardHref!)).toContain("관심 차량: Tucson 2026");
 
   await login(page);
   await page.goto("/admin/configuracion");
@@ -163,19 +179,9 @@ test("7. WhatsApp 메시지에 올바른 차량 정보와 링크가 들어간다
   await expect(page.getByTestId("form-message")).toHaveText("설정이 저장되었습니다.");
 
   await page.goto("/vehiculos/kia-seltos");
-  const href = await page.getByTestId("vehicle-main").getByTestId("whatsapp-link").getAttribute("href");
+  const href = await page.getByTestId("vehicle-main").getByTestId("option-inquiry").getAttribute("href");
   expect(href).toMatch(/^https:\/\/wa\.me\/595981000000\?text=/);
-  const msg = decodeURIComponent(href!.split("?text=")[1]);
-  expect(msg).toBe(
-    [
-      "안녕하세요. BS CARS 차량 렌탈에 대해 문의드립니다.",
-      "관심 차량: Kia Seltos 2027",
-      "월 렌트료: USD 900 + IVA",
-      "IVA 포함 가격: USD 990",
-      "차량의 이용 가능 여부와 렌탈 조건을 안내해 주실 수 있을까요?",
-      "차량 상세 링크: http://localhost:3000/vehiculos/kia-seltos",
-    ].join("\n"),
-  );
+  expect(decodeURIComponent(href!.split("?text=")[1])).toBe(expected("http://localhost:3000/vehiculos/kia-seltos"));
 
   // 원상 복구 (실제 번호는 운영자가 등록)
   await page.goto("/admin/configuracion");

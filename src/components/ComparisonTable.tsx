@@ -1,13 +1,12 @@
 import Link from "next/link";
 import { CopyLinkButton } from "./CopyLinkButton";
-import { WhatsAppButton } from "./WhatsAppButton";
+import { OptionInquiryButton } from "./OptionInquiryButton";
 import { VehiclePhoto } from "./VehiclePhoto";
 import { serviceSummary } from "@/content/services";
 import { coverPhoto } from "@/lib/data";
 import { ko } from "@/i18n/ko";
 import { brandLabel, formatKm, formatMoney, priceBreakdown, specValue, vehicleTitle } from "@/lib/format";
 import { vehicleUrl, type SiteBase } from "@/lib/site-url";
-import { buildVehicleInquiryMessage } from "@/lib/whatsapp";
 import type { Settings, Vehicle } from "@/lib/types";
 
 interface Row {
@@ -64,14 +63,9 @@ export function ComparisonTable({
     const url = vehicleUrl(base, v.slug);
     return (
       <div className="flex flex-col gap-2">
-        <Link href={`/vehiculos/${v.slug}`} className="btn btn-primary btn-sm">상세 정보</Link>
+        <Link href={`/vehiculos/${v.slug}`} className="btn btn-outline btn-sm">상세 정보</Link>
         <CopyLinkButton url={url} />
-        <WhatsAppButton
-          number={settings.whatsapp_number}
-          message={buildVehicleInquiryMessage(v, settings, url)}
-          className="btn btn-outline btn-sm"
-          showMissingNotice={false}
-        />
+        <OptionInquiryButton vehicle={v} settings={settings} url={url} className="btn btn-primary btn-sm px-2" />
       </div>
     );
   };
@@ -143,7 +137,6 @@ export function ComparisonTable({
       </div>
       <p className="mt-3 text-xs text-graphite">
         사양은 공개 자료 기준 참고 정보이며 차량별로 확인이 필요합니다. &lsquo;—&rsquo; 는 확인된 정보가 없는 항목입니다.
-        {!settings.whatsapp_number && ` ${ko.whatsappMissing}`}
       </p>
     </div>
   );

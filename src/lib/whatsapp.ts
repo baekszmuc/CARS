@@ -42,6 +42,14 @@ export function whatsappLink(number: string | null | undefined, message: string)
   return `https://wa.me/${n}?text=${encodeURIComponent(message)}`;
 }
 
+/**
+ * "이 옵션 문의하기" 링크. 번호가 등록되어 있으면 BS CARS 로 바로 보내고,
+ * 없으면 WhatsApp 에서 받는 사람을 고르게 한다 (링크를 공유해 준 담당자에게 보내는 용도).
+ */
+export function optionInquiryLink(number: string | null | undefined, message: string): string {
+  return whatsappLink(number, message) ?? whatsappShareLink(message);
+}
+
 /** 수신 번호 없이 메시지만 공유 (차량 링크 공유용) */
 export function whatsappShareLink(message: string): string {
   return `https://wa.me/?text=${encodeURIComponent(message)}`;

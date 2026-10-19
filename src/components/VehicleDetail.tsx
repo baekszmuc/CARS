@@ -8,11 +8,11 @@ import { StatusBadge } from "./StatusBadge";
 import { VehicleCard } from "./VehicleCard";
 import { VehicleGallery } from "./VehicleGallery";
 import { VehiclePhoto } from "./VehiclePhoto";
-import { WhatsAppButton } from "./WhatsAppButton";
+import { OptionInquiryButton } from "./OptionInquiryButton";
 import { ko } from "@/i18n/ko";
 import { photoUrl, sortPhotos } from "@/lib/data";
 import { billingUnitLabel, brandLabel, formatKm, specValue, vehicleTitle } from "@/lib/format";
-import { buildVehicleInquiryMessage, whatsappShareLink } from "@/lib/whatsapp";
+import { whatsappShareLink } from "@/lib/whatsapp";
 import type { HandoverItem, Settings, Vehicle } from "@/lib/types";
 
 function Block({ n, title, id, children }: { n: string; title: string; id: string; children: React.ReactNode }) {
@@ -41,7 +41,6 @@ export function VehicleDetail({
   const title = vehicleTitle(vehicle);
   const brand = brandLabel(vehicle);
   const photos = sortPhotos(vehicle.vehicle_photos);
-  const message = buildVehicleInquiryMessage(vehicle, settings, url);
   const short = (v: string | null) => (v ? v.replace(/\s*\(.*\)\s*/g, "").split(" · ")[0] : null);
   const stats = [
     { label: ko.common.year, value: vehicle.model_year ? String(vehicle.model_year) : ko.common.pending },
@@ -83,8 +82,10 @@ export function VehicleDetail({
           </div>
 
           <div className="mt-5 flex max-w-md flex-col gap-2">
-            <WhatsAppButton number={settings.whatsapp_number} message={message} className="btn btn-primary" />
-            <Link href={`/contacto?vehiculo=${vehicle.slug}`} className="btn btn-outline">렌탈 문의하기</Link>
+            <OptionInquiryButton vehicle={vehicle} settings={settings} url={url} />
+            <p className="text-[11px] text-graphite">
+              버튼을 누르면 이 차량 정보와 가격이 담긴 WhatsApp 메시지가 열립니다.
+            </p>
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
@@ -187,8 +188,7 @@ export function VehicleDetail({
             희망 일정을 알려 주시면 이용 가능 여부와 렌탈 조건을 안내드립니다. 문의만으로 예약이 확정되지는 않습니다.
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link href={`/contacto?vehiculo=${vehicle.slug}`} className="btn btn-light">문의 양식 작성</Link>
-            <WhatsAppButton number={settings.whatsapp_number} message={message} className="btn btn-outline-dark" showMissingNotice={false} />
+            <OptionInquiryButton vehicle={vehicle} settings={settings} url={url} className="btn btn-light" />
           </div>
         </section>
 
