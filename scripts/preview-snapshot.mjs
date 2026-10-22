@@ -7,7 +7,9 @@
  * - CSS는 각 페이지에 인라인, 폰트는 Google Fonts 링크로 대체
  * - 스크립트 제거 (링크 복사·문의 양식은 미리보기용 최소 스크립트로 대체)
  * - 내부 링크를 미리보기 파일명으로 변환
- * - 관리자 화면은 로그인 후 읽기 전용 스냅샷으로 포함 (E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD)
+ * - PREVIEW_MODE=customer (기본): 고객용 페이지만. 문의 양식은 입력 내용을 WhatsApp 메시지로 만들어 준다.
+ * - PREVIEW_MODE=admin: 관리자 화면만 (로그인 후 읽기 전용 스냅샷, E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD).
+ *   고객 페이지로 가는 링크는 PREVIEW_PUBLIC_URL 의 공개 주소로 연결한다.
  * - PREVIEW_PUBLIC_URL 이 있으면 차량 링크(문의 메시지·링크 복사)를 그 주소의 미리보기 페이지로 바꾼다
  *   예: PREVIEW_PUBLIC_URL=https://baekszmuc.github.io/CARS
  */
@@ -19,6 +21,7 @@ import { chromium } from "@playwright/test";
 const out = path.resolve(process.argv[2] ?? "preview-out");
 const base = (process.argv[3] ?? "http://localhost:3000").replace(/\/$/, "");
 const publicUrl = (process.env.PREVIEW_PUBLIC_URL ?? "").replace(/\/$/, "");
+const mode = process.env.PREVIEW_MODE === "admin" ? "admin" : "customer";
 
 /** 사이트 기준 주소로 만들어진 차량 링크를 공개 미리보기 주소로 바꾼다 (평문·URL 인코딩 모두) */
 function toPublicLinks(html) {
@@ -56,20 +59,29 @@ const pages = [
   { url: "/privacidad", file: "privacidad.html" },
 ];
 
+/** 고객 페이지 경로 → 미리보기 파일명 (없으면 null) */
+function publicFile(pathOnly) {
+  if (pathOnly === "/") return "index.html";
+  if (pathOnly === "/vehiculos") return "vehiculos.html";
+  const m = pathOnly.match(/^\/vehiculos\/([^/]+)$/);
+  if (m) return `vehiculo-${m[1]}.html`;
+  const simple = { "/servicios": "servicios.html", "/incluye": "incluye.html", "/contacto": "contacto.html", "/privacidad": "privacidad.html" };
+  return simple[pathOnly] ?? null;
+}
+
 function mapHref(href, adminMap) {
   if (!href || /^(https?:|mailto:|tel:|#)/.test(href)) return href;
   const [p, hash] = href.split("#");
   const pathOnly = p.split("?")[0];
   const h = hash ? `#${hash}` : "";
-  if (pathOnly === "" ) return h || "#";
+  if (pathOnly === "") return h || "#";
   if (adminMap[pathOnly]) return adminMap[pathOnly] + h;
   if (pathOnly.startsWith("/admin")) return "#";
-  if (pathOnly === "/") return `index.html${h}`;
-  if (pathOnly === "/vehiculos") return `vehiculos.html${h}`;
-  const m = pathOnly.match(/^\/vehiculos\/([^/]+)$/);
-  if (m) return `vehiculo-${m[1]}.html${h}`;
-  const simple = { "/servicios": "servicios.html", "/incluye": "incluye.html", "/contacto": "contacto.html", "/privacidad": "privacidad.html" };
-  return (simple[pathOnly] ?? "#") + h;
+  const file = publicFile(pathOnly);
+  if (!file) return "#";
+  // 관리자 미리보기에서 고객 페이지는 공개 주소로 연다
+  if (mode === "admin") return publicUrl ? `${publicUrl}/${file}${h}` : "#";
+  return file + h;
 }
 
 const cssCache = new Map();
@@ -104,11 +116,30 @@ document.addEventListener("click", function (e) {
     b.classList.toggle("ring-2", on); b.classList.toggle("ring-obsidian", on); b.classList.toggle("opacity-75", !on);
   });
 });
+`;
+
+/** 고객용: 문의 양식 → 입력 내용이 담긴 WhatsApp 메시지 (BS CARS 번호로) */
+const CUSTOMER_FORM_SCRIPT = `
 document.addEventListener("submit", function (e) {
   e.preventDefault();
-  var f = e.target, n = f.querySelector(".preview-note");
-  if (!n) { n = document.createElement("p"); n.className = "preview-note"; f.appendChild(n); }
-  n.textContent = "미리보기에서는 제출되지 않습니다. 실제 사이트에서는 문의가 데이터베이스에 저장됩니다.";
+  var f = e.target;
+  var val = function (n) { var el = f.elements[n]; return el ? String(el.value || "").trim() : ""; };
+  var note = f.querySelector(".preview-note");
+  if (!note) { note = document.createElement("div"); note.className = "preview-note"; f.appendChild(note); }
+  if (!val("name") || !val("phone")) { note.textContent = "이름과 전화번호를 입력해 주세요."; return; }
+  var sel = f.elements["vehicle_id"], car = sel && sel.selectedIndex > 0 ? sel.options[sel.selectedIndex].text : "아직 정하지 않음";
+  var lines = ["안녕하세요. BS CARS 차량 렌탈 문의드립니다.", "이름: " + val("name"), "전화번호: " + val("phone")];
+  if (val("email")) lines.push("이메일: " + val("email"));
+  lines.push("관심 차량: " + car);
+  if (val("pickup_date") || val("return_date")) lines.push("희망 렌트 기간: " + (val("pickup_date") || "미정") + " ~ " + (val("return_date") || "미정"));
+  if (val("message")) lines.push("문의사항: " + val("message"));
+  var wa = document.querySelector('a[href^="https://wa.me/"][href*="wa.me/5"]');
+  var num = wa ? (wa.getAttribute("href").match(/wa\\.me\\/(\\d+)/) || [])[1] : "";
+  var href = "https://wa.me/" + (num || "") + "?text=" + encodeURIComponent(lines.join("\\n"));
+  note.innerHTML = "";
+  var p = document.createElement("p"); p.textContent = "아래 버튼을 누르면 입력하신 내용으로 WhatsApp 메시지가 열립니다. 문의만으로 예약이 확정되지는 않습니다.";
+  var a = document.createElement("a"); a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer"; a.className = "btn btn-primary"; a.textContent = "WhatsApp으로 문의 보내기";
+  note.appendChild(p); note.appendChild(a); a.focus();
 });`;
 
 async function capture(file, isMain, adminMap, banner) {
@@ -149,14 +180,15 @@ async function capture(file, isMain, adminMap, banner) {
   }
   const fix = (s) =>
     toPublicLinks(s).replace(/src="@@IMG([^"@]*)@@"/g, (_, e) => `src="${imgMap[decodeURIComponent(e)]}"`).replace(/href="@@([^"@]*)@@"/g, (_, e) => `href="${mapHref(toPublicLinks(decodeURIComponent(e)), adminMap)}"`);
-  const bannerHtml = `<div class="preview-banner">${banner}</div>`;
+  const bannerHtml = banner ? `<div class="preview-banner">${banner}</div>` : "";
   const style = `<link rel="stylesheet" href="${FONTS}"><style>${css}
 .preview-banner{background:#26282c;color:#e9eaed;font-size:12px;line-height:1.5;padding:8px max(16px,env(safe-area-inset-left,0px));text-align:center}
 .preview-banner a{color:#fff;text-decoration:underline;margin-left:8px}
-.preview-note{margin-top:8px;font-size:14px;font-weight:600;color:#8a5a00}
+.preview-note{display:grid;gap:10px;margin-top:4px;font-size:14px;color:#26282c}
+.preview-note:empty{display:none}
 </style>`;
   const head = fix(html.head).replace(/<meta name="viewport"[^>]*>/, "").replace(/<meta charset="[^"]*">/, "");
-  const body = bannerHtml + fix(html.body) + `<script>${PREVIEW_SCRIPT}</script>`;
+  const body = bannerHtml + fix(html.body) + `<script>${PREVIEW_SCRIPT}${mode === "customer" ? CUSTOMER_FORM_SCRIPT : ""}</script>`;
   const doc = isMain
     ? `${head.match(/<title>[\s\S]*?<\/title>/)?.[0] ?? "<title>BS CARS</title>"}\n${head.replace(/<title>[\s\S]*?<\/title>/, "")}\n${style}\n<div class="${html.htmlClass}">${body}</div>`
     : `<!doctype html><html lang="ko" class="${html.htmlClass}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${head}${style}</head><body>${body}</body></html>`;
@@ -165,37 +197,37 @@ async function capture(file, isMain, adminMap, banner) {
 
 fs.mkdirSync(out, { recursive: true });
 
-// 관리자 스냅샷 대상
-await page.goto(`${base}/admin/login`);
-await page.getByLabel("이메일").fill(email);
-await page.getByLabel("비밀번호").fill(password);
-await page.getByRole("button", { name: "로그인" }).click();
-await page.waitForURL(`${base}/admin`);
-await page.goto(`${base}/admin/vehiculos`);
-const firstEdit = await page.locator('a:has-text("수정")').first().getAttribute("href");
-const adminPages = [
-  { url: "/admin", file: "admin.html" },
-  { url: "/admin/vehiculos", file: "admin-vehiculos.html" },
-  { url: firstEdit, file: "admin-vehiculo.html" },
-  { url: "/admin/consultas", file: "admin-consultas.html" },
-  { url: "/admin/configuracion", file: "admin-configuracion.html" },
-];
-const adminMap = Object.fromEntries(adminPages.map((p) => [p.url, p.file]));
-
-const publicBanner = `정적 디자인 미리보기 — 실제 배포 전 화면입니다. 링크 이동과 링크 복사만 동작하며 문의는 저장되지 않습니다.<a href="admin.html">관리자 화면 보기</a>`;
-const adminBanner = `관리자 화면 미리보기 (읽기 전용) — 버튼과 저장은 동작하지 않습니다.<a href="index.html">고객용 사이트로</a>`;
-
-for (const p of adminPages) {
-  await page.goto(base + p.url);
-  await page.waitForLoadState("networkidle");
-  await capture(p.file, false, adminMap, adminBanner);
-}
-// 공개 페이지는 로그아웃 상태로
-await page.context().clearCookies();
-for (const p of pages) {
-  await page.goto(base + p.url);
-  await page.waitForLoadState("networkidle");
-  await capture(p.file, p.file === "index.html", adminMap, publicBanner);
+if (mode === "admin") {
+  // 관리자 화면만 (대시보드가 index.html)
+  await page.goto(`${base}/admin/login`);
+  await page.getByLabel("이메일").fill(email);
+  await page.getByLabel("비밀번호").fill(password);
+  await page.getByRole("button", { name: "로그인" }).click();
+  await page.waitForURL(`${base}/admin`);
+  await page.goto(`${base}/admin/vehiculos`);
+  const firstEdit = await page.locator('a:has-text("수정")').first().getAttribute("href");
+  const adminPages = [
+    { url: "/admin", file: "index.html" },
+    { url: "/admin/vehiculos", file: "admin-vehiculos.html" },
+    { url: firstEdit, file: "admin-vehiculo.html" },
+    { url: "/admin/consultas", file: "admin-consultas.html" },
+    { url: "/admin/configuracion", file: "admin-configuracion.html" },
+  ];
+  const adminMap = Object.fromEntries(adminPages.map((p) => [p.url, p.file]));
+  const site = publicUrl ? `<a href="${publicUrl}/" target="_blank" rel="noopener">고객용 사이트 열기 ↗</a>` : "";
+  const banner = `관리자 화면 미리보기 (읽기 전용) — 버튼과 저장은 동작하지 않습니다. 실제 관리는 사이트 배포 후 /admin 에서 로그인해 사용합니다.${site}`;
+  for (const p of adminPages) {
+    await page.goto(base + p.url);
+    await page.waitForLoadState("networkidle");
+    await capture(p.file, p.file === "index.html", adminMap, banner);
+  }
+} else {
+  // 고객용 페이지만 (관리자 화면·미리보기 안내 없음)
+  for (const p of pages) {
+    await page.goto(base + p.url);
+    await page.waitForLoadState("networkidle");
+    await capture(p.file, p.file === "index.html", {}, "");
+  }
 }
 await browser.close();
-console.log(`preview written to ${out}:`, fs.readdirSync(out).join(", "));
+console.log(`${mode} preview written to ${out}:`, fs.readdirSync(out).join(", "));

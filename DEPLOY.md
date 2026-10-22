@@ -132,4 +132,14 @@ npm run admin:create -- 운영자이메일@example.com '10자-이상-강력한-�
 
 ## 10. 디자인 미리보기 만들기
 
-로컬에서 사이트를 실행한 상태에서 `npm run preview:snapshot -- 출력폴더` 를 실행하면, 공개 페이지와 관리자 화면(읽기 전용)을 정적 HTML로 내보냅니다. 배포 전에 디자인을 공유할 때 사용합니다.
+로컬에서 사이트를 실행한 상태에서 정적 HTML 미리보기를 만들 수 있습니다. 고객용과 관리자용을 따로 만듭니다.
+
+```bash
+# 고객용 (GitHub Pages·고객 공유 링크용): 고객 페이지만, 문의 양식은 WhatsApp 메시지로 연결
+PREVIEW_PUBLIC_URL=https://baekszmuc.github.io/CARS npm run preview:snapshot -- 출력폴더
+
+# 관리자용 (운영자 전용 비공개 링크): 관리자 화면만, 고객 페이지 링크는 공개 주소로 연결
+PREVIEW_MODE=admin PREVIEW_PUBLIC_URL=https://baekszmuc.github.io/CARS npm run preview:snapshot -- 출력폴더
+```
+
+관리자용 미리보기는 고객에게 공유하는 곳(GitHub Pages 등)에 올리지 마세요.
