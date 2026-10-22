@@ -40,6 +40,27 @@
 
   --font-sans: "TT Interphases", var(--font-inter), var(--font-kr), "Apple SD Gothic Neo", "Malgun Gothic", system-ui,
     sans-serif;
+  /* 로고 타이포그래피: 넓고 각진 글자 + 넓은 자간. 한글은 Noto Sans KR 로 대체된다. */
+  --font-display: var(--font-michroma), var(--font-kr), "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+
+/* 제목·라벨·가격·버튼은 로고와 같은 서체로. Michroma 는 한 가지 굵기뿐이라 가짜 굵게는 끈다. */
+h1,
+h2,
+h3,
+.eyebrow,
+.price-final,
+.btn,
+.display {
+  font-family: var(--font-display);
+  font-synthesis-weight: none;
+}
+h1,
+h2,
+h3,
+.display {
+  letter-spacing: 0.06em;
+  line-height: 1.3;
 }
 
 html {
@@ -71,7 +92,7 @@ body {
 }
 
 .btn {
-  letter-spacing: 0.01em;
+  letter-spacing: 0.08em;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -176,7 +197,7 @@ body {
 .eyebrow {
   font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--color-steel);
 }
@@ -184,6 +205,6 @@ body {
 .price-final {
   font-size: 1.5rem;
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.02em;
   line-height: 1.1;
 }
