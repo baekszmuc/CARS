@@ -79,3 +79,13 @@ export function formatDateTime(value: string): string {
     timeZone: "America/Asuncion",
   });
 }
+
+/** "163 CV", "113 HP (…)" 같은 출력 사양에서 첫 숫자와 단위를 꺼낸다. */
+export function powerOf(v: Pick<Vehicle, "specs">): { value: number; unit: string; hp: number } | null {
+  const m = specValue(v, "출력")?.match(/([\d.,]+)\s*(CV|HP|PS|kW)/i);
+  if (!m) return null;
+  const value = Number(m[1].replace(/,/g, ""));
+  const unit = m[2].toUpperCase();
+  const hp = unit === "KW" ? value * 1.341 : unit === "HP" ? value : value * 0.986;
+  return Number.isFinite(value) ? { value, unit: unit === "KW" ? "kW" : unit, hp } : null;
+}

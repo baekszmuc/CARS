@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { VehicleDetail } from "@/components/VehicleDetail";
+import { maxHpOf } from "@/components/VehicleOverview";
 import { Notice } from "@/components/admin/ui";
 import { VEHICLE_FIELDS } from "@/lib/data";
 import { getAdminContext } from "@/lib/admin";
@@ -13,10 +14,11 @@ export default async function PreviewPage({ params }: { params: Promise<{ id: st
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const { supabase } = await getAdminContext();
-  const [vRes, sRes, iRes] = await Promise.all([
+  const [vRes, sRes, iRes, allRes] = await Promise.all([
     supabase.from("vehicles").select(VEHICLE_FIELDS).eq("id", id).maybeSingle(),
     supabase.from("settings").select("*").eq("id", 1).single(),
     supabase.from("handover_items").select("*").eq("is_active", true).order("category").order("sort_order"),
+    supabase.from("vehicles").select("specs").eq("is_archived", false),
   ]);
   const vehicle = vRes.data as Vehicle | null;
   if (!vehicle) notFound();
@@ -33,6 +35,7 @@ export default async function PreviewPage({ params }: { params: Promise<{ id: st
           settings={settings}
           url={vehicleUrl(resolveSiteBase(settings), vehicle.slug)}
           handover={(iRes.data ?? []) as HandoverItem[]}
+          maxHp={maxHpOf([vehicle, ...((allRes.data ?? []) as Vehicle[])])}
         />
       </div>
     </div>

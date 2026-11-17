@@ -54,7 +54,7 @@ export function LogoUploader({ currentUrl }: { currentUrl: string | null }) {
           </button>
         )}
       </div>
-      <p className="text-xs text-graphite">{currentUrl ? "" : "업로드한 로고가 없으면 기본 BS CARS 로고가 사용됩니다."} {msg}</p>
+      <p className="text-xs text-graphite">{currentUrl ? "" : "업로드한 로고가 없으면 기본 BS Select 로고가 사용됩니다."} {msg}</p>
     </div>
   );
 }

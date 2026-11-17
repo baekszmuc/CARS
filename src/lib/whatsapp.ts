@@ -43,7 +43,7 @@ export function whatsappLink(number: string | null | undefined, message: string)
 }
 
 /**
- * "이 옵션 문의하기" 링크. 번호가 등록되어 있으면 BS CARS 로 바로 보내고,
+ * "이 옵션 문의하기" 링크. 번호가 등록되어 있으면 BS Select 로 바로 보내고,
  * 없으면 WhatsApp 에서 받는 사람을 고르게 한다 (링크를 공유해 준 담당자에게 보내는 용도).
  */
 export function optionInquiryLink(number: string | null | undefined, message: string): string {

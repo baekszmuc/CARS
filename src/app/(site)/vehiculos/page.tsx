@@ -8,7 +8,7 @@ export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "차량 카탈로그 및 비교",
-  description: "BS CARS 렌탈 차량의 연식, 주행거리, 기본 렌트료, IVA, IVA 포함 가격을 비교하세요.",
+  description: "BS Select 렌탈 차량의 연식, 주행거리, 기본 렌트료, IVA, IVA 포함 가격을 비교하세요.",
   alternates: { canonical: "/vehiculos" },
 };
 

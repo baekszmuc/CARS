@@ -20,17 +20,16 @@ async function cardFor(page: Page, title: string) {
   return page.getByTestId("vehicle-card").filter({ has: page.getByRole("heading", { name: new RegExp(`(^| )${esc}$`) }) });
 }
 
-test("1. BS CARS 웹사이트가 정상적으로 열린다", async ({ page }) => {
+test("1. BS Select 웹사이트가 정상적으로 열린다", async ({ page }) => {
   const res = await page.goto("/");
   expect(res?.status()).toBe(200);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("BS CARS 차량 옵션");
-  // 제품 우선: 첫 화면에 차량 카드 3개와 상세/문의 버튼
-  await expect(page.getByTestId("vehicle-card")).toHaveCount(3);
-  await expect(page.getByTestId("vehicle-card").first()).toBeInViewport();
-  await expect(page.getByTestId("vehicle-card").first().getByRole("link", { name: "상세 정보" })).toBeVisible();
-  await expect(page.getByTestId("comparison-table")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("BS Select 차량 렌탈");
+  // 홈: 차량별 탭(스크립트 없이 동작) — 첫 차량이 보이고, 탭을 누르면 다른 차량으로 바뀐다
+  await expect(page.getByRole("heading", { name: /Tivoli 2023$/ })).toBeVisible();
+  await page.locator(".tab-labels label", { hasText: "Tucson" }).click();
+  await expect(page.getByRole("heading", { name: /Tucson 2026$/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Tivoli 2023$/ })).toBeHidden();
   await expect(page.getByRole("heading", { name: "렌트료에 포함된 서비스" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "차량 렌트 시 함께 제공되는 항목" })).toBeVisible();
   for (const p of ["/vehiculos", "/servicios", "/incluye", "/contacto", "/privacidad"]) {
     expect((await page.goto(p))?.status(), p).toBe(200);
   }
@@ -153,13 +152,21 @@ test("6. 링크 복사 버튼이 정상 작동한다", async ({ page, context })
 test("7. WhatsApp 메시지에 올바른 차량 정보와 링크가 들어간다", async ({ page }) => {
   const expected = (url: string) =>
     [
-      "안녕하세요. BS CARS 차량 렌탈에 대해 문의드립니다.",
+      "안녕하세요. BS Select 차량 렌탈에 대해 문의드립니다.",
       "관심 차량: Kia Seltos 2027",
       "월 렌트료: USD 900 + IVA",
       "IVA 포함 가격: USD 990",
       "차량의 이용 가능 여부와 렌탈 조건을 안내해 주실 수 있을까요?",
       `차량 상세 링크: ${url}`,
     ].join("\n");
+  // 등록된 번호를 기억해 두고 잠시 비운다
+  await login(page);
+  await page.goto("/admin/configuracion");
+  const originalNumber = await page.getByLabel("WhatsApp 번호").inputValue();
+  await page.getByLabel("WhatsApp 번호").fill("");
+  await page.getByRole("button", { name: "설정 저장" }).click();
+  await expect(page.getByTestId("form-message")).toHaveText("설정이 저장되었습니다.");
+
   // 번호 미등록: "이 옵션 문의하기"가 받는 사람을 고르는 WhatsApp 메시지로 열린다
   await page.goto("/vehiculos/kia-seltos");
   const btn0 = page.getByTestId("vehicle-main").getByTestId("option-inquiry");
@@ -172,7 +179,6 @@ test("7. WhatsApp 메시지에 올바른 차량 정보와 링크가 들어간다
   const cardHref = await (await cardFor(page, "Tucson 2026")).getByTestId("option-inquiry").getAttribute("href");
   expect(decodeURIComponent(cardHref!)).toContain("관심 차량: Tucson 2026");
 
-  await login(page);
   await page.goto("/admin/configuracion");
   await page.getByLabel("WhatsApp 번호").fill("+595 981 000 000");
   await page.getByRole("button", { name: "설정 저장" }).click();
@@ -183,9 +189,9 @@ test("7. WhatsApp 메시지에 올바른 차량 정보와 링크가 들어간다
   expect(href).toMatch(/^https:\/\/wa\.me\/595981000000\?text=/);
   expect(decodeURIComponent(href!.split("?text=")[1])).toBe(expected("http://localhost:3000/vehiculos/kia-seltos"));
 
-  // 원상 복구 (실제 번호는 운영자가 등록)
+  // 원래 번호로 복구
   await page.goto("/admin/configuracion");
-  await page.getByLabel("WhatsApp 번호").fill("");
+  await page.getByLabel("WhatsApp 번호").fill(originalNumber);
   await page.getByRole("button", { name: "설정 저장" }).click();
   await expect(page.getByTestId("form-message")).toHaveText("설정이 저장되었습니다.");
 });
@@ -227,6 +233,7 @@ test("10. 사진 업로드가 정상 작동한다", async ({ page }) => {
   // 참고 이미지 표시
   await page.getByTestId("photo-list").locator("li").first().getByLabel(/참고 이미지/).check();
   await expect(page.getByTestId("photo-list").locator("li").first().getByLabel(/참고 이미지/)).toBeChecked();
+  await page.waitForLoadState("networkidle");
 
   // 고객 페이지에 실제 사진 표시
   await page.goto(`/vehiculos/${testVehicleSlug}`);

@@ -42,7 +42,7 @@ export default async function InquiriesPage({ searchParams }: Props) {
       ) : (
         <ul className="grid gap-3">
           {inquiries.map((i) => {
-            const wa = whatsappLink(i.phone, `안녕하세요 ${i.name}님, BS CARS입니다. 렌탈 문의 관련하여 연락드립니다.`);
+            const wa = whatsappLink(i.phone, `안녕하세요 ${i.name}님, BS Select입니다. 렌탈 문의 관련하여 연락드립니다.`);
             return (
               <li key={i.id} className="grid gap-4 rounded-lg border border-silver bg-white p-5 lg:grid-cols-[1fr_320px]" data-testid="inquiry-row">
                 <div className="min-w-0">

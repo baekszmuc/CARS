@@ -24,8 +24,8 @@
   --color-silver: #e9eaed;
   --color-mist: #f5f6f7;
   /* Aevum 레퍼런스: 차가운 회청색 바탕과 이미지 타일 */
-  --color-cloud: #f3f5f8;
-  --color-tile: #e8ecf1;
+  --color-cloud: #f2f2f2;
+  --color-tile: #e6e6e6;
   --color-sky: #c9d6e6;
 
   /* 모서리: 각진 형태 */
@@ -207,4 +207,164 @@ body {
   font-weight: 600;
   letter-spacing: 0.02em;
   line-height: 1.1;
+}
+
+/* ── 레퍼런스 스타일: 검은 띠 위에 놓인 차량 사진 ─────────────────────── */
+.band-hero {
+  background: linear-gradient(to bottom, #0e0f11 0, #0e0f11 64%, transparent 64%);
+}
+
+/* ── 탭 (스크립트 없이 동작: 라디오 + 라벨) ─────────────────────────────
+   구조: .tabset > input.tab-input × n, .tab-heroes > .tab-hero × n,
+         .tab-labels > label × n, .tab-panels > .tab-panel × n            */
+.tab-hero,
+.tab-panel {
+  display: none;
+}
+.tab-labels label {
+  position: relative;
+  cursor: pointer;
+  padding: 0.875rem 0.25rem;
+  color: var(--color-graphite);
+  white-space: nowrap;
+}
+.tab-labels label:hover {
+  color: var(--color-obsidian);
+}
+.tab-labels label::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: transparent;
+}
+.tab-link-active,
+.tab-link-active:hover {
+  color: var(--color-obsidian);
+  font-weight: 600;
+}
+.tab-link-active::after {
+  background: var(--color-obsidian) !important;
+}
+.tab-input:nth-of-type(1):checked ~ .tab-heroes > .tab-hero:nth-child(1),
+.tab-input:nth-of-type(1):checked ~ .tab-panels > .tab-panel:nth-child(1) {
+  display: block;
+}
+.tab-input:nth-of-type(1):checked ~ .tab-labels label:nth-of-type(1) {
+  color: var(--color-obsidian);
+  font-weight: 600;
+}
+.tab-input:nth-of-type(1):checked ~ .tab-labels label:nth-of-type(1)::after {
+  background: var(--color-obsidian);
+}
+.tab-input:nth-of-type(1):focus-visible ~ .tab-labels label:nth-of-type(1) {
+  outline: 2px solid var(--color-obsidian);
+  outline-offset: 2px;
+}
+.tab-input:nth-of-type(2):checked ~ .tab-heroes > .tab-hero:nth-child(2),
+.tab-input:nth-of-type(2):checked ~ .tab-panels > .tab-panel:nth-child(2) {
+  display: block;
+}
+.tab-input:nth-of-type(2):checked ~ .tab-labels label:nth-of-type(2) {
+  color: var(--color-obsidian);
+  font-weight: 600;
+}
+.tab-input:nth-of-type(2):checked ~ .tab-labels label:nth-of-type(2)::after {
+  background: var(--color-obsidian);
+}
+.tab-input:nth-of-type(2):focus-visible ~ .tab-labels label:nth-of-type(2) {
+  outline: 2px solid var(--color-obsidian);
+  outline-offset: 2px;
+}
+.tab-input:nth-of-type(3):checked ~ .tab-heroes > .tab-hero:nth-child(3),
+.tab-input:nth-of-type(3):checked ~ .tab-panels > .tab-panel:nth-child(3) {
+  display: block;
+}
+.tab-input:nth-of-type(3):checked ~ .tab-labels label:nth-of-type(3) {
+  color: var(--color-obsidian);
+  font-weight: 600;
+}
+.tab-input:nth-of-type(3):checked ~ .tab-labels label:nth-of-type(3)::after {
+  background: var(--color-obsidian);
+}
+.tab-input:nth-of-type(3):focus-visible ~ .tab-labels label:nth-of-type(3) {
+  outline: 2px solid var(--color-obsidian);
+  outline-offset: 2px;
+}
+.tab-input:nth-of-type(4):checked ~ .tab-heroes > .tab-hero:nth-child(4),
+.tab-input:nth-of-type(4):checked ~ .tab-panels > .tab-panel:nth-child(4) {
+  display: block;
+}
+.tab-input:nth-of-type(4):checked ~ .tab-labels label:nth-of-type(4) {
+  color: var(--color-obsidian);
+  font-weight: 600;
+}
+.tab-input:nth-of-type(4):checked ~ .tab-labels label:nth-of-type(4)::after {
+  background: var(--color-obsidian);
+}
+.tab-input:nth-of-type(4):focus-visible ~ .tab-labels label:nth-of-type(4) {
+  outline: 2px solid var(--color-obsidian);
+  outline-offset: 2px;
+}
+.tab-input:nth-of-type(5):checked ~ .tab-heroes > .tab-hero:nth-child(5),
+.tab-input:nth-of-type(5):checked ~ .tab-panels > .tab-panel:nth-child(5) {
+  display: block;
+}
+.tab-input:nth-of-type(5):checked ~ .tab-labels label:nth-of-type(5) {
+  color: var(--color-obsidian);
+  font-weight: 600;
+}
+.tab-input:nth-of-type(5):checked ~ .tab-labels label:nth-of-type(5)::after {
+  background: var(--color-obsidian);
+}
+.tab-input:nth-of-type(5):focus-visible ~ .tab-labels label:nth-of-type(5) {
+  outline: 2px solid var(--color-obsidian);
+  outline-offset: 2px;
+}
+.tab-input:nth-of-type(6):checked ~ .tab-heroes > .tab-hero:nth-child(6),
+.tab-input:nth-of-type(6):checked ~ .tab-panels > .tab-panel:nth-child(6) {
+  display: block;
+}
+.tab-input:nth-of-type(6):checked ~ .tab-labels label:nth-of-type(6) {
+  color: var(--color-obsidian);
+  font-weight: 600;
+}
+.tab-input:nth-of-type(6):checked ~ .tab-labels label:nth-of-type(6)::after {
+  background: var(--color-obsidian);
+}
+.tab-input:nth-of-type(6):focus-visible ~ .tab-labels label:nth-of-type(6) {
+  outline: 2px solid var(--color-obsidian);
+  outline-offset: 2px;
+}
+.tab-input:nth-of-type(7):checked ~ .tab-heroes > .tab-hero:nth-child(7),
+.tab-input:nth-of-type(7):checked ~ .tab-panels > .tab-panel:nth-child(7) {
+  display: block;
+}
+.tab-input:nth-of-type(7):checked ~ .tab-labels label:nth-of-type(7) {
+  color: var(--color-obsidian);
+  font-weight: 600;
+}
+.tab-input:nth-of-type(7):checked ~ .tab-labels label:nth-of-type(7)::after {
+  background: var(--color-obsidian);
+}
+.tab-input:nth-of-type(7):focus-visible ~ .tab-labels label:nth-of-type(7) {
+  outline: 2px solid var(--color-obsidian);
+  outline-offset: 2px;
+}
+.tab-input:nth-of-type(8):checked ~ .tab-heroes > .tab-hero:nth-child(8),
+.tab-input:nth-of-type(8):checked ~ .tab-panels > .tab-panel:nth-child(8) {
+  display: block;
+}
+.tab-input:nth-of-type(8):checked ~ .tab-labels label:nth-of-type(8) {
+  color: var(--color-obsidian);
+  font-weight: 600;
+}
+.tab-input:nth-of-type(8):checked ~ .tab-labels label:nth-of-type(8)::after {
+  background: var(--color-obsidian);
+}
+.tab-input:nth-of-type(8):focus-visible ~ .tab-labels label:nth-of-type(8) {
+  outline: 2px solid var(--color-obsidian);
+  outline-offset: 2px;
 }

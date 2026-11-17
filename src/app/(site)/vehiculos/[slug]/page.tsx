@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { VehicleDetail } from "@/components/VehicleDetail";
+import { maxHpOf } from "@/components/VehicleOverview";
 import { coverPhoto, getHandoverItems, getPublishedVehicle, getPublishedVehicles, getSettings, getSiteBase, photoUrl } from "@/lib/data";
 import { brandLabel, formatKm, formatMoney, priceBreakdown, vehicleTitle } from "@/lib/format";
 import { ko } from "@/i18n/ko";
@@ -82,7 +83,7 @@ export default async function VehiclePage({ params }: Props) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
-      <VehicleDetail vehicle={vehicle} settings={settings} url={url} handover={handover} related={related} />
+      <VehicleDetail vehicle={vehicle} settings={settings} url={url} handover={handover} related={related} maxHp={maxHpOf(all)} />
     </>
   );
 }

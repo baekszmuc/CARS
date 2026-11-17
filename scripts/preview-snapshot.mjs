@@ -38,7 +38,7 @@ const password = process.env.E2E_ADMIN_PASSWORD ?? "TestPassword123!";
 const exe = fs.existsSync("/opt/pw-browsers/chromium") ? "/opt/pw-browsers/chromium" : undefined;
 
 const FONTS =
-  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap";
+  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&family=Noto+Sans+KR:wght@400;500;700&display=swap";
 
 const browser = await chromium.launch({ executablePath: exe });
 const page = await browser.newPage({ viewport: { width: 1366, height: 900 } });
@@ -118,7 +118,7 @@ document.addEventListener("click", function (e) {
 });
 `;
 
-/** 고객용: 문의 양식 → 입력 내용이 담긴 WhatsApp 메시지 (BS CARS 번호로) */
+/** 고객용: 문의 양식 → 입력 내용이 담긴 WhatsApp 메시지 (BS Select 번호로) */
 const CUSTOMER_FORM_SCRIPT = `
 document.addEventListener("submit", function (e) {
   e.preventDefault();
@@ -128,7 +128,7 @@ document.addEventListener("submit", function (e) {
   if (!note) { note = document.createElement("div"); note.className = "preview-note"; f.appendChild(note); }
   if (!val("name") || !val("phone")) { note.textContent = "이름과 전화번호를 입력해 주세요."; return; }
   var sel = f.elements["vehicle_id"], car = sel && sel.selectedIndex > 0 ? sel.options[sel.selectedIndex].text : "아직 정하지 않음";
-  var lines = ["안녕하세요. BS CARS 차량 렌탈 문의드립니다.", "이름: " + val("name"), "전화번호: " + val("phone")];
+  var lines = ["안녕하세요. BS Select 차량 렌탈 문의드립니다.", "이름: " + val("name"), "전화번호: " + val("phone")];
   if (val("email")) lines.push("이메일: " + val("email"));
   lines.push("관심 차량: " + car);
   if (val("pickup_date") || val("return_date")) lines.push("희망 렌트 기간: " + (val("pickup_date") || "미정") + " ~ " + (val("return_date") || "미정"));
@@ -190,7 +190,7 @@ async function capture(file, isMain, adminMap, banner) {
   const head = fix(html.head).replace(/<meta name="viewport"[^>]*>/, "").replace(/<meta charset="[^"]*">/, "");
   const body = bannerHtml + fix(html.body) + `<script>${PREVIEW_SCRIPT}${mode === "customer" ? CUSTOMER_FORM_SCRIPT : ""}</script>`;
   const doc = isMain
-    ? `${head.match(/<title>[\s\S]*?<\/title>/)?.[0] ?? "<title>BS CARS</title>"}\n${head.replace(/<title>[\s\S]*?<\/title>/, "")}\n${style}\n<div class="${html.htmlClass}">${body}</div>`
+    ? `${head.match(/<title>[\s\S]*?<\/title>/)?.[0] ?? "<title>BS Select</title>"}\n${head.replace(/<title>[\s\S]*?<\/title>/, "")}\n${style}\n<div class="${html.htmlClass}">${body}</div>`
     : `<!doctype html><html lang="ko" class="${html.htmlClass}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${head}${style}</head><body>${body}</body></html>`;
   fs.writeFileSync(path.join(out, file), doc);
 }
