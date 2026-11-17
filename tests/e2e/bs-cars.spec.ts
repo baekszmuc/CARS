@@ -23,12 +23,12 @@ async function cardFor(page: Page, title: string) {
 test("1. BS Select 웹사이트가 정상적으로 열린다", async ({ page }) => {
   const res = await page.goto("/");
   expect(res?.status()).toBe(200);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("BS Select 차량 렌탈");
-  // 홈: 차량별 탭(스크립트 없이 동작) — 첫 차량이 보이고, 탭을 누르면 다른 차량으로 바뀐다
-  await expect(page.getByRole("heading", { name: /Tivoli 2023$/ })).toBeVisible();
-  await page.locator(".tab-labels label", { hasText: "Tucson" }).click();
-  await expect(page.getByRole("heading", { name: /Tucson 2026$/ })).toBeVisible();
-  await expect(page.getByRole("heading", { name: /Tivoli 2023$/ })).toBeHidden();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName("BS Select 차량 렌탈");
+  // 홈: 브랜드 랜딩 — 컬렉션에 차량 3종이 모두 보인다
+  await expect(page.getByTestId("home-vehicle")).toHaveCount(3);
+  for (const name of [/Tivoli 2023$/, /Kia Seltos 2027$/, /Tucson 2026$/]) {
+    await expect(page.getByRole("heading", { name })).toBeVisible();
+  }
   await expect(page.getByRole("heading", { name: "렌트료에 포함된 서비스" })).toBeVisible();
   for (const p of ["/vehiculos", "/servicios", "/incluye", "/contacto", "/privacidad"]) {
     expect((await page.goto(p))?.status(), p).toBe(200);

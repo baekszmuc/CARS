@@ -368,3 +368,42 @@ body {
   outline: 2px solid var(--color-obsidian);
   outline-offset: 2px;
 }
+
+@layer components {
+/* 홈 랜딩 — 고급 톤 */
+.lux-eyebrow {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.6);
+}
+.lux-label {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.5);
+}
+.lux-rule {
+  width: 3.5rem;
+  height: 1px;
+  background: #c8b48a;
+}
+.lux-link {
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid currentColor;
+  transition: gap 0.2s ease, opacity 0.2s ease;
+}
+.lux-link:hover { gap: 1rem; opacity: 0.8; }
+
+}
+
+/* 홈에서는 헤더도 어둡게 (스크립트 없이 :has 로 전환) */
+body:has(.home-lux) .site-header {
+  background: rgb(8 9 10 / 0.92);
+  border-color: rgb(255 255 255 / 0.08);
+}
+body:has(.home-lux) .site-header .hdr-text { color: rgb(255 255 255 / 0.8); }
+body:has(.home-lux) .site-header .hdr-text:hover { color: #fff; }
+body:has(.home-lux) .site-header svg[role="img"] { color: #fff; }
+body:has(.home-lux) footer { margin-top: 0; }

@@ -13,12 +13,12 @@ const links = [
 /** 레퍼런스 구성: 왼쪽 메뉴 · 가운데 로고 · 오른쪽 문의 */
 export function SiteHeader({ name, logoUrl }: { name: string; logoUrl: string | null }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-black/5 bg-[#f7f7f7]/95 backdrop-blur">
+    <header className="site-header sticky top-0 z-30 border-b border-black/5 bg-[#f7f7f7]/95 backdrop-blur">
       <div className="container-page grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4">
         <div className="flex items-center gap-8">
           <details className="relative">
             <summary
-              className="flex cursor-pointer list-none items-center gap-2.5 text-sm text-charcoal hover:text-obsidian [&::-webkit-details-marker]:hidden"
+              className="hdr-text flex cursor-pointer list-none items-center gap-2.5 text-sm text-charcoal hover:text-obsidian [&::-webkit-details-marker]:hidden"
               aria-label="메뉴 열기"
             >
               <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true">
@@ -40,7 +40,7 @@ export function SiteHeader({ name, logoUrl }: { name: string; logoUrl: string | 
             <ul className="flex items-center gap-6 text-xs text-graphite">
               {links.slice(1, 4).map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className="hover:text-obsidian">{l.label}</Link>
+                  <Link href={l.href} className="hdr-text hover:text-obsidian">{l.label}</Link>
                 </li>
               ))}
             </ul>
@@ -48,7 +48,7 @@ export function SiteHeader({ name, logoUrl }: { name: string; logoUrl: string | 
         </div>
         <Wordmark name={name} logoUrl={logoUrl} />
         <div className="flex justify-end">
-          <Link href="/contacto" className="text-sm text-charcoal hover:text-obsidian">문의하기</Link>
+          <Link href="/contacto" className="hdr-text text-sm text-charcoal hover:text-obsidian">문의하기</Link>
         </div>
       </div>
     </header>
