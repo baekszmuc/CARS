@@ -4,6 +4,7 @@ import { inter, michroma, notoKr } from "./fonts";
 import { getSettings, getSiteBase } from "@/lib/data";
 import { getLocale, getT } from "@/i18n/server";
 import { htmlLang, ogLocale } from "@/i18n/locale";
+import { MotionScript } from "@/components/MotionScript";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [settings, base, { t, locale }] = await Promise.all([getSettings(), getSiteBase(), getT()]);
@@ -29,8 +30,11 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const locale = await getLocale();
   return (
-    <html lang={htmlLang[locale]} className={`${inter.variable} ${notoKr.variable} ${michroma.variable}`}>
-      <body className="min-h-screen antialiased">{children}</body>
+    <html suppressHydrationWarning lang={htmlLang[locale]} className={`${inter.variable} ${notoKr.variable} ${michroma.variable}`}>
+      <body className="min-h-screen antialiased">
+        {children}
+        <MotionScript />
+      </body>
     </html>
   );
 }

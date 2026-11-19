@@ -199,7 +199,10 @@ async function capture(file, isMain, adminMap, banner) {
   const html = await page.evaluate(
     ({ adminMapIn }) => {
       const doc = document.documentElement.cloneNode(true);
-      doc.querySelectorAll("script, link[rel=preload], link[rel=modulepreload], link[rel=icon], noscript, next-route-announcer, nextjs-portal").forEach((n) => n.remove());
+      doc.classList.remove("js-motion");
+      doc.querySelectorAll(".is-in").forEach((n) => n.classList.remove("is-in"));
+      doc.querySelectorAll(".hero-parallax, .hero-lift").forEach((n) => { n.style.removeProperty("transform"); n.style.removeProperty("opacity"); });
+      doc.querySelectorAll("script:not(#motion-script), link[rel=preload], link[rel=modulepreload], link[rel=icon], noscript, next-route-announcer, nextjs-portal").forEach((n) => n.remove());
       const css = [...doc.querySelectorAll('link[rel="stylesheet"]')].map((l) => {
         const h = l.getAttribute("href");
         l.remove();
