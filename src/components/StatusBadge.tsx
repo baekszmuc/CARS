@@ -1,5 +1,6 @@
 import { ko } from "@/i18n/ko";
 import type { VehicleStatus } from "@/lib/types";
+import { getT } from "@/i18n/server";
 
 const styles: Record<VehicleStatus, string> = {
   available: "bg-[#e7f4ed] text-ok",
@@ -9,10 +10,11 @@ const styles: Record<VehicleStatus, string> = {
   unavailable: "bg-silver text-charcoal",
 };
 
-export function StatusBadge({ status }: { status: VehicleStatus }) {
+export async function StatusBadge({ status }: { status: VehicleStatus }) {
+  const { t } = await getT();
   return (
     <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-semibold ${styles[status]}`}>
-      {ko.vehicleStatus[status]}
+      {t(ko.vehicleStatus[status])}
     </span>
   );
 }

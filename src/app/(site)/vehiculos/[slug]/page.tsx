@@ -6,31 +6,29 @@ import { coverPhoto, getHandoverItems, getPublishedVehicle, getPublishedVehicles
 import { brandLabel, formatKm, formatMoney, priceBreakdown, vehicleTitle } from "@/lib/format";
 import { ko } from "@/i18n/ko";
 import { vehicleUrl } from "@/lib/site-url";
+import { getT } from "@/i18n/server";
+import { translateValue } from "@/i18n/t";
 
-export const revalidate = 300;
-// 새로 게시된 차량도 첫 요청 시 렌더링한다 (차량별 HTML을 따로 만들지 않음)
-export const dynamicParams = true;
-
-export async function generateStaticParams() {
-  return [];
-}
+// 표시 언어(쿠키·브라우저 언어)에 따라 요청마다 렌더링한다.
+export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const [vehicle, settings] = await Promise.all([getPublishedVehicle(slug), getSettings()]);
-  if (!vehicle) return { title: "차량을 찾을 수 없습니다", robots: { index: false } };
+  const [vehicle, settings, { t, locale }] = await Promise.all([getPublishedVehicle(slug), getSettings(), getT()]);
+  if (!vehicle) return { title: t("차량을 찾을 수 없습니다"), robots: { index: false } };
   const title = [brandLabel(vehicle), vehicleTitle(vehicle)].filter(Boolean).join(" ");
   const p = priceBreakdown(vehicle);
-  const per = ko.billingUnitPer[p.unit];
+  const per = t(ko.billingUnitPer[p.unit]);
   const parts = [
-    vehicle.variant,
-    `기본 렌트료 ${formatMoney(p.base, settings.currency)} ${per}`,
-    p.ivaApplies ? `IVA 포함 ${formatMoney(p.total, settings.currency)} ${per}` : null,
-    formatKm(vehicle.mileage_km) ? `주행거리 ${formatKm(vehicle.mileage_km)}` : null,
+    vehicle.variant ? translateValue(locale, vehicle.variant) : null,
+    `${t("기본 렌트료")} ${formatMoney(p.base, settings.currency)} ${per}`,
+    p.ivaApplies ? `${t("IVA 포함")} ${formatMoney(p.total, settings.currency)} ${per}` : null,
+    formatKm(vehicle.mileage_km) ? `${t("주행거리")} ${formatKm(vehicle.mileage_km)}` : null,
   ].filter(Boolean);
-  const description = `${settings.business_name} ${title} 렌탈 — ${parts.join(" · ")}. 정비·보험 포함 서비스와 렌트 시 제공 품목을 확인하세요.`;
+  const description = t("{name} {title} 렌탈 — {parts}. 정비·보험 포함 서비스와 렌트 시 제공 품목을 확인하세요.", { name: settings.business_name, title, parts: parts.join(" · ") });
+  const rental = t("{title} 렌탈", { title });
   const cover = coverPhoto(vehicle);
   const images = [
     cover
@@ -38,17 +36,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       : { url: `/og/${vehicle.slug}`, width: 1200, height: 630, alt: title },
   ];
   return {
-    title: `${title} 렌탈`,
+    title: rental,
     description,
     alternates: { canonical: `/vehiculos/${vehicle.slug}` },
     openGraph: {
       type: "website",
-      title: `${title} 렌탈 | ${settings.business_name}`,
+      title: `${rental} | ${settings.business_name}`,
       description,
       url: `/vehiculos/${vehicle.slug}`,
       images,
     },
-    twitter: { card: "summary_large_image", title: `${title} 렌탈`, description, images },
+    twitter: { card: "summary_large_image", title: rental, description, images },
   };
 }
 

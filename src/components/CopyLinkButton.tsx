@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import { ko } from "@/i18n/ko";
+import type { SiteLocale } from "@/i18n/locale";
+import { translate } from "@/i18n/t";
 
 async function copyText(text: string): Promise<boolean> {
   try {
@@ -31,12 +33,15 @@ async function copyText(text: string): Promise<boolean> {
 export function CopyLinkButton({
   url,
   className = "btn btn-outline btn-sm",
-  label = ko.common.copyLink,
+  label,
+  locale = "ko",
 }: {
   url: string;
   className?: string;
   label?: string;
+  locale?: SiteLocale;
 }) {
+  const t = (s: string) => translate(locale, s);
   const [state, setState] = useState<"idle" | "ok" | "fail">("idle");
   return (
     <button
@@ -50,7 +55,7 @@ export function CopyLinkButton({
       }}
     >
       <span aria-live="polite">
-        {state === "ok" ? ko.common.copied : state === "fail" ? "복사 실패 — 주소를 직접 선택하세요" : label}
+        {state === "ok" ? t(ko.common.copied) : state === "fail" ? t("복사 실패 — 주소를 직접 선택하세요") : (label ?? t(ko.common.copyLink))}
       </span>
     </button>
   );

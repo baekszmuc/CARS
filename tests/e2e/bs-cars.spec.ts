@@ -35,6 +35,21 @@ test("1. BS Select 웹사이트가 정상적으로 열린다", async ({ page }) 
   }
 });
 
+test("15. 언어 전환: 스페인어·영어로 바뀌고 선택이 유지된다", async ({ page, context }) => {
+  await page.goto("/vehiculos/tucson");
+  await page.locator('[data-lang="es"]').click();
+  await expect(page).toHaveURL(/\/vehiculos\/tucson$/);
+  await expect(page.locator("html")).toHaveAttribute("lang", "es");
+  await expect(page.getByRole("heading", { name: "Ficha técnica del vehículo" })).toBeVisible();
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Servicios incluidos en el alquiler" })).toBeVisible();
+  await page.locator('[data-lang="en"]').click();
+  await expect(page.getByRole("heading", { name: "Services included in the rent" })).toBeVisible();
+  await page.locator('[data-lang="ko"]').click();
+  await expect(page.getByRole("heading", { name: "렌트료에 포함된 서비스" })).toBeVisible();
+  await context.clearCookies();
+});
+
 test("2·3. 초기 차량 3종이 정확한 가격으로 표시되고 IVA 합계가 일치한다", async ({ page }) => {
   await page.goto("/vehiculos");
   for (const v of INITIAL) {

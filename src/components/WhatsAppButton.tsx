@@ -1,5 +1,6 @@
 import { ko } from "@/i18n/ko";
 import { whatsappLink } from "@/lib/whatsapp";
+import { getT } from "@/i18n/server";
 
 function Icon() {
   return (
@@ -13,10 +14,10 @@ function Icon() {
  * 관리자가 등록한 WhatsApp 번호로 문의 링크를 만든다.
  * 번호가 없으면 링크를 만들지 않고 안내 문구를 표시한다.
  */
-export function WhatsAppButton({
+export async function WhatsAppButton({
   number,
   message,
-  label = ko.common.whatsapp,
+  label,
   className = "btn btn-primary",
   showMissingNotice = true,
 }: {
@@ -26,18 +27,19 @@ export function WhatsAppButton({
   className?: string;
   showMissingNotice?: boolean;
 }) {
+  const { t } = await getT();
   const href = whatsappLink(number, message);
   if (!href) {
     return showMissingNotice ? (
       <p className="text-sm text-graphite" data-testid="whatsapp-missing">
-        {ko.whatsappMissing}
+        {t(ko.whatsappMissing)}
       </p>
     ) : null;
   }
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className={className} data-testid="whatsapp-link">
       <Icon />
-      {label}
+      {label ?? t(ko.common.whatsapp)}
     </a>
   );
 }

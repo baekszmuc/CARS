@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { ko } from "@/i18n/ko";
 
 /** Web Share API를 지원하는 기기에서만 표시된다. */
-export function ShareButton({ url, title, text }: { url: string; title: string; text?: string }) {
+export function ShareButton({ url, title, text, label = ko.common.share }: { url: string; title: string; text?: string; label?: string }) {
   const [supported, setSupported] = useState(false);
   useEffect(() => {
     setSupported(typeof navigator !== "undefined" && typeof navigator.share === "function");
@@ -19,7 +19,7 @@ export function ShareButton({ url, title, text }: { url: string; title: string; 
         });
       }}
     >
-      {ko.common.share}
+      {label}
     </button>
   );
 }

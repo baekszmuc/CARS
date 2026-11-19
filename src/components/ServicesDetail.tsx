@@ -1,6 +1,7 @@
 import { ko } from "@/i18n/ko";
 import { insurance, maintenance, majorParts, municipal, support, tiresBattery } from "@/content/services";
 import type { Settings } from "@/lib/types";
+import { getT } from "@/i18n/server";
 
 function Card({ n, title, children }: { n: string; title: string; children: React.ReactNode }) {
   return (
@@ -31,77 +32,83 @@ function Note({ children }: { children: React.ReactNode }) {
   return <p className="border-l-2 border-silver pl-3 text-xs text-graphite">{children}</p>;
 }
 
-export function MaintenanceCard() {
+export async function MaintenanceCard() {
+  const { t } = await getT();
   return (
-    <Card n="01" title={maintenance.title}>
-      <p>{maintenance.summary}</p>
-      <List items={maintenance.items} />
-      <Note>{maintenance.note} 부속서 C의 주기별 세부 항목은 계약 시 함께 안내드립니다.</Note>
+    <Card n="01" title={t(maintenance.title)}>
+      <p>{t(maintenance.summary)}</p>
+      <List items={maintenance.items.map((i) => t(i))} />
+      <Note>{t(maintenance.note)} {t("부속서 C의 주기별 세부 항목은 계약 시 함께 안내드립니다.")}</Note>
     </Card>
   );
 }
 
-export function PartsCard() {
+export async function PartsCard() {
+  const { t } = await getT();
   return (
-    <Card n="02" title={majorParts.title}>
-      <p>{majorParts.summary}</p>
+    <Card n="02" title={t(majorParts.title)}>
+      <p>{t(majorParts.summary)}</p>
       <ul className="divide-y divide-silver rounded border border-silver">
         {majorParts.items.map((i) => (
           <li key={i.km} className="flex gap-4 px-3 py-2">
             <span className="w-24 shrink-0 font-semibold tabular-nums">{i.km}</span>
-            <span>{i.text}</span>
+            <span>{t(i.text)}</span>
           </li>
         ))}
       </ul>
-      <Note>{majorParts.note}</Note>
+      <Note>{t(majorParts.note)}</Note>
     </Card>
   );
 }
 
-export function TiresCard() {
+export async function TiresCard() {
+  const { t } = await getT();
   return (
-    <Card n="03" title={tiresBattery.title}>
-      <List items={tiresBattery.items} />
-      <Note>{tiresBattery.note}</Note>
+    <Card n="03" title={t(tiresBattery.title)}>
+      <List items={tiresBattery.items.map((i) => t(i))} />
+      <Note>{t(tiresBattery.note)}</Note>
     </Card>
   );
 }
 
-export function InsuranceCard({ settings }: { settings: Settings }) {
-  const provider = settings.insurance_provider || "보험사";
+export async function InsuranceCard({ settings }: { settings: Settings }) {
+  const { t } = await getT();
+  const provider = settings.insurance_provider || t("보험사");
   return (
-    <Card n="04" title={insurance.title}>
+    <Card n="04" title={t(insurance.title)}>
       <p className="inline-flex rounded bg-mist px-2 py-1 text-xs font-semibold" data-testid="insurance-status">
-        {ko.insuranceStatus[settings.insurance_status]}
+        {t(ko.insuranceStatus[settings.insurance_status])}
         {settings.insurance_status !== "not_set" && settings.insurance_provider ? ` · ${settings.insurance_provider}` : ""}
       </p>
       <p>
         {settings.insurance_status === "active"
-          ? `${provider} 보험을 기준으로 다음 항목이 보장됩니다.`
-          : `${provider} 제안서 기준 보장 항목은 다음과 같습니다.`}
+          ? t("{provider} 보험을 기준으로 다음 항목이 보장됩니다.", { provider })
+          : t("{provider} 제안서 기준 보장 항목은 다음과 같습니다.", { provider })}
       </p>
-      <List items={insurance.coverage} />
+      <List items={insurance.coverage.map((i) => t(i))} />
       {settings.insurance_note && <p>{settings.insurance_note}</p>}
-      <Note>{insurance.note}</Note>
+      <Note>{t(insurance.note)}</Note>
     </Card>
   );
 }
 
-export function MunicipalCard() {
+export async function MunicipalCard() {
+  const { t } = await getT();
   return (
-    <Card n="05" title={municipal.title}>
-      <p>{municipal.text}</p>
+    <Card n="05" title={t(municipal.title)}>
+      <p>{t(municipal.text)}</p>
     </Card>
   );
 }
 
-export function SupportCard({ settings }: { settings: Settings }) {
+export async function SupportCard({ settings }: { settings: Settings }) {
+  const { t } = await getT();
   return (
-    <Card n="06" title={support.title}>
-      <p>{support.text}</p>
+    <Card n="06" title={t(support.title)}>
+      <p>{t(support.text)}</p>
       <p className="text-graphite">
-        업무시간: {settings.support_hours || "확인 후 안내드립니다"}
-        {settings.phone ? ` · 전화 ${settings.phone}` : ""}
+        {t("업무시간")}: {settings.support_hours || t("확인 후 안내드립니다")}
+        {settings.phone ? ` · ${t("전화")} ${settings.phone}` : ""}
       </p>
     </Card>
   );

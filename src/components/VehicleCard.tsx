@@ -7,6 +7,8 @@ import { vehicleUrl } from "@/lib/site-url";
 import { OptionInquiryButton } from "./OptionInquiryButton";
 import { brandLabel, formatKm, specValue, vehicleTitle } from "@/lib/format";
 import type { Vehicle } from "@/lib/types";
+import { getT } from "@/i18n/server";
+import { translateValue } from "@/i18n/t";
 
 /** 카드 사양 줄: 짧은 값만 (괄호 안 설명은 상세 페이지에서) */
 function short(value: string | null): string | null {
@@ -22,7 +24,7 @@ export async function VehicleCard({
   currency: string;
   index?: number;
 }) {
-  const [settings, base] = await Promise.all([getSettings(), getSiteBase()]);
+  const [settings, base, { t, locale }] = await Promise.all([getSettings(), getSiteBase(), getT()]);
   const title = vehicleTitle(vehicle);
   const brand = brandLabel(vehicle);
   const facts = [
@@ -30,10 +32,12 @@ export async function VehicleCard({
     formatKm(vehicle.mileage_km),
     short(specValue(vehicle, "변속기")),
     short(specValue(vehicle, "연료")),
-  ].filter(Boolean) as string[];
+  ]
+    .filter(Boolean)
+    .map((f) => translateValue(locale, f as string));
 
   return (
-    <article className="group flex h-full flex-col bg-white" data-testid="vehicle-card">
+    <article className="reveal group flex h-full flex-col bg-white" data-testid="vehicle-card">
       <Link href={`/vehiculos/${vehicle.slug}`} tabIndex={-1} aria-hidden="true" className="block overflow-hidden">
         <VehiclePhoto
           photo={coverPhoto(vehicle)}
@@ -52,8 +56,8 @@ export async function VehicleCard({
           {brand && <span className="text-graphite">{brand} </span>}
           {title}
         </h3>
-        {vehicle.variant && <p className="text-xs text-graphite">{vehicle.variant}</p>}
-        <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-charcoal" aria-label="주요 정보">
+        {vehicle.variant && <p className="text-xs text-graphite">{translateValue(locale, vehicle.variant)}</p>}
+        <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-charcoal" aria-label={t("주요 정보")}>
           {facts.map((f, i) => (
             <span key={f} className="flex items-center gap-2">
               {i > 0 && <span aria-hidden="true" className="h-3 w-px bg-silver" />}
@@ -66,7 +70,7 @@ export async function VehicleCard({
         </div>
         <div className="mt-4 grid grid-cols-2 gap-2">
           <OptionInquiryButton vehicle={vehicle} settings={settings} url={vehicleUrl(base, vehicle.slug)} className="btn btn-primary btn-sm px-2" />
-          <Link href={`/vehiculos/${vehicle.slug}`} className="btn btn-outline btn-sm">상세 정보</Link>
+          <Link href={`/vehiculos/${vehicle.slug}`} className="btn btn-outline btn-sm">{t("자세히 보기")}</Link>
         </div>
       </div>
     </article>

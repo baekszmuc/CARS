@@ -12,7 +12,9 @@ export default defineConfig({
   use: {
     baseURL: process.env.E2E_BASE_URL ?? "http://localhost:3000",
     trace: "retain-on-failure",
+    // 사이트는 브라우저 언어로 표시 언어를 고른다. 테스트는 한국어 화면 기준.
+    locale: "ko-KR",
     launchOptions: fs.existsSync(chromium) ? { executablePath: chromium } : {},
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], locale: "ko-KR" } }],
 });

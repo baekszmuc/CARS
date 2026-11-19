@@ -1,3 +1,4 @@
+import { getT } from "@/i18n/server";
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/Section";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
@@ -6,19 +7,23 @@ import { getPublishedVehicles, getSettings } from "@/lib/data";
 import { vehicleTitle } from "@/lib/format";
 import { buildGeneralInquiryMessage } from "@/lib/whatsapp";
 
-export const metadata: Metadata = {
-  title: "렌탈 문의",
-  description: "관심 차량과 희망 일정을 남겨 주시면 이용 가능 여부와 렌탈 조건을 안내드립니다.",
-  alternates: { canonical: "/contacto" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getT();
+  return {
+    title: t("렌탈 문의"),
+    description: t("관심 차량과 희망 일정을 남겨 주시면 이용 가능 여부와 렌탈 조건을 안내드립니다."),
+    alternates: { canonical: "/contacto" },
+  };
+}
 
 type Props = { searchParams: Promise<{ vehiculo?: string }> };
 
 export default async function ContactPage({ searchParams }: Props) {
-  const [{ vehiculo }, settings, vehicles] = await Promise.all([
+  const [{ vehiculo }, settings, vehicles, { t, locale }] = await Promise.all([
     searchParams,
     getSettings(),
     getPublishedVehicles(),
+    getT(),
   ]);
   const options = vehicles.map((v) => ({ id: v.id, slug: v.slug, label: vehicleTitle(v) }));
 
@@ -26,47 +31,47 @@ export default async function ContactPage({ searchParams }: Props) {
     <>
       <PageHeader
         eyebrow="Contacto"
-        title="렌탈 문의"
+        title={t("렌탈 문의")}
         description={
-          settings.inquiry_notice ||
-          "관심 차량과 희망 일정을 알려 주시면 이용 가능 여부와 렌탈 조건을 안내드립니다."
+          (locale === "ko" && settings.inquiry_notice) ||
+          t("관심 차량과 희망 일정을 알려 주시면 이용 가능 여부와 렌탈 조건을 안내드립니다.")
         }
       />
       <div className="container-page grid gap-12 py-14 lg:grid-cols-[1.6fr_1fr]">
-        <div className="bg-white p-6 sm:p-8"><InquiryForm vehicles={options} selectedSlug={vehiculo} /></div>
+        <div className="bg-white p-6 sm:p-8"><InquiryForm vehicles={options} selectedSlug={vehiculo} locale={locale} /></div>
         <aside className="space-y-6">
           <div className="bg-white p-6">
-            <h2 className="text-lg font-bold">WhatsApp 상담</h2>
+            <h2 className="text-lg font-bold">{t("WhatsApp 상담")}</h2>
             <div className="mt-4">
-              <WhatsAppButton number={settings.whatsapp_number} message={buildGeneralInquiryMessage(settings)} />
+              <WhatsAppButton number={settings.whatsapp_number} message={buildGeneralInquiryMessage(settings, t)} />
             </div>
           </div>
           <div className="bg-white p-6">
-            <h2 className="text-lg font-bold">연락처</h2>
+            <h2 className="text-lg font-bold">{t("연락처")}</h2>
             <dl className="mt-4 space-y-3 text-sm">
-              <div>
-                <dt className="text-graphite">전화</dt>
-                <dd className="font-semibold">
-                  {settings.phone ? (
+              {settings.phone && (
+                <div>
+                  <dt className="text-graphite">{t("전화")}</dt>
+                  <dd className="font-semibold">
                     <a href={`tel:${settings.phone.replace(/[^0-9+]/g, "")}`}>{settings.phone}</a>
-                  ) : (
-                    "준비 중"
-                  )}
-                </dd>
-              </div>
+                  </dd>
+                </div>
+              )}
+              {settings.email && (
+                <div>
+                  <dt className="text-graphite">{t("이메일")}</dt>
+                  <dd className="font-semibold"><a href={`mailto:${settings.email}`}>{settings.email}</a></dd>
+                </div>
+              )}
+              {settings.address && (
+                <div>
+                  <dt className="text-graphite">{t("주소")}</dt>
+                  <dd className="font-semibold">{settings.address}</dd>
+                </div>
+              )}
               <div>
-                <dt className="text-graphite">이메일</dt>
-                <dd className="font-semibold">
-                  {settings.email ? <a href={`mailto:${settings.email}`}>{settings.email}</a> : "준비 중"}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-graphite">주소</dt>
-                <dd className="font-semibold">{settings.address || "준비 중"}</dd>
-              </div>
-              <div>
-                <dt className="text-graphite">전화 기술 지원</dt>
-                <dd className="font-semibold">평일 및 토요일 업무시간 · {settings.support_hours || "업무시간 확인 후 안내"}</dd>
+                <dt className="text-graphite">{t("전화 지원")}</dt>
+                <dd className="font-semibold">{t("평일·토요일 업무시간")}{settings.support_hours ? ` · ${settings.support_hours}` : ""}</dd>
               </div>
             </dl>
           </div>

@@ -11,7 +11,7 @@ export function SectionHeading({
   id?: string;
 }) {
   return (
-    <div className="mx-auto mb-8 max-w-2xl text-center">
+    <div className="reveal mx-auto mb-8 max-w-2xl text-center">
       {eyebrow && <p className="eyebrow">{eyebrow}</p>}
       <h2 id={id} className="mt-2 text-2xl font-normal tracking-tight text-balance sm:text-3xl">
         {title}

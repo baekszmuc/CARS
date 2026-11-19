@@ -1,5 +1,6 @@
 import { optionInquiryLink, buildVehicleInquiryMessage } from "@/lib/whatsapp";
 import type { Settings, Vehicle } from "@/lib/types";
+import { getT } from "@/i18n/server";
 
 function Icon() {
   return (
@@ -10,12 +11,12 @@ function Icon() {
 }
 
 /** 이 차량 정보가 담긴 WhatsApp 메시지를 바로 여는 버튼 */
-export function OptionInquiryButton({
+export async function OptionInquiryButton({
   vehicle,
   settings,
   url,
   className = "btn btn-primary",
-  label = "이 옵션 문의하기",
+  label,
 }: {
   vehicle: Vehicle;
   settings: Settings;
@@ -23,11 +24,12 @@ export function OptionInquiryButton({
   className?: string;
   label?: string;
 }) {
-  const href = optionInquiryLink(settings.whatsapp_number, buildVehicleInquiryMessage(vehicle, settings, url));
+  const { t } = await getT();
+  const href = optionInquiryLink(settings.whatsapp_number, buildVehicleInquiryMessage(vehicle, settings, url, t));
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className={className} data-testid="option-inquiry">
       <Icon />
-      {label}
+      {label ?? t("이 옵션 문의하기")}
     </a>
   );
 }

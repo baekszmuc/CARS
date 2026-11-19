@@ -46,7 +46,7 @@ export function SettingsForm({ settings }: { settings: Settings }) {
         <div className="sm:col-span-2">
           <Field name="address" label="주소" defaultValue={settings.address} error={e.address} />
         </div>
-        <Field name="support_hours" label="전화 기술 지원 업무시간" defaultValue={settings.support_hours}
+        <Field name="support_hours" label="전화 지원 업무시간" defaultValue={settings.support_hours}
           error={e.support_hours} hint="예: 월–금 08:00–17:00, 토 08:00–12:00 (확인된 시간만 입력)" />
       </fieldset>
 

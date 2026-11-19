@@ -10,6 +10,8 @@
  * - PREVIEW_MODE=customer (기본): 고객용 페이지만. 문의 양식은 입력 내용을 WhatsApp 메시지로 만들어 준다.
  * - PREVIEW_MODE=admin: 관리자 화면만 (로그인 후 읽기 전용 스냅샷, E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD).
  *   고객 페이지로 가는 링크는 PREVIEW_PUBLIC_URL 의 공개 주소로 연결한다.
+ * - 고객용은 언어별로 내보낸다: 한국어는 출력폴더 바로 아래, 스페인어·영어는 es/ · en/ 하위 폴더.
+ *   상단 KO/ES/EN 전환 링크는 해당 언어 폴더의 같은 페이지로 연결된다.
  * - PREVIEW_PUBLIC_URL 이 있으면 차량 링크(문의 메시지·링크 복사)를 그 주소의 미리보기 페이지로 바꾼다
  *   예: PREVIEW_PUBLIC_URL=https://baekszmuc.github.io/CARS
  */
@@ -30,8 +32,8 @@ function toPublicLinks(html) {
   const raw = new RegExp(esc(`${base}/vehiculos/`) + "([a-z0-9-]+)", "g");
   const enc = new RegExp(esc(encodeURIComponent(`${base}/vehiculos/`)) + "([a-z0-9-]+)", "g");
   return html
-    .replace(raw, (_, slug) => `${publicUrl}/vehiculo-${slug}.html`)
-    .replace(enc, (_, slug) => encodeURIComponent(`${publicUrl}/vehiculo-${slug}.html`));
+    .replace(raw, (_, slug) => `${publicUrl}/${dirOf(curLocale)}vehiculo-${slug}.html`)
+    .replace(enc, (_, slug) => encodeURIComponent(`${publicUrl}/${dirOf(curLocale)}vehiculo-${slug}.html`));
 }
 const email = process.env.E2E_ADMIN_EMAIL ?? "admin@bscars.local";
 const password = process.env.E2E_ADMIN_PASSWORD ?? "TestPassword123!";
@@ -41,7 +43,13 @@ const FONTS =
   "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Michroma&family=Noto+Sans+KR:wght@400;500;700&display=swap";
 
 const browser = await chromium.launch({ executablePath: exe });
-const page = await browser.newPage({ viewport: { width: 1366, height: 900 } });
+const LOCALES = ["ko", "es", "en"];
+let context = await browser.newContext({ viewport: { width: 1366, height: 900 }, locale: "ko-KR" });
+let page = await context.newPage();
+/** 지금 내보내는 언어 (ko 는 출력폴더 바로 아래, 나머지는 하위 폴더) */
+let curLocale = "ko";
+const dirOf = (l) => (l === "ko" ? "" : `${l}/`);
+const upOf = (l) => (l === "ko" ? "" : "../");
 
 // 공개 차량 slug 목록
 await page.goto(`${base}/vehiculos`);
@@ -69,7 +77,9 @@ function publicFile(pathOnly) {
   return simple[pathOnly] ?? null;
 }
 
-function mapHref(href, adminMap) {
+function mapHref(href, adminMap, currentFile) {
+  const lang = href?.match(/^\?lang=(ko|es|en)$/)?.[1];
+  if (lang) return `${upOf(curLocale)}${dirOf(lang)}${currentFile}`;
   if (!href || /^(https?:|mailto:|tel:|#)/.test(href)) return href;
   const [p, hash] = href.split("#");
   const pathOnly = p.split("?")[0];
@@ -142,6 +152,49 @@ document.addEventListener("submit", function (e) {
   note.appendChild(p); note.appendChild(a); a.focus();
 });`;
 
+/** 미리보기용 스크립트의 한국어 문구를 현재 언어로 */
+const SCRIPT_TEXT = {
+  es: {
+    "복사되었습니다": "Copiado",
+    "사진 선택": "Elegir foto",
+    "이름과 전화번호를 입력해 주세요.": "Ingrese su nombre y teléfono.",
+    "아직 정하지 않음": "Aún no decidido",
+    "안녕하세요. BS Select 차량 렌탈 문의드립니다.": "Hola, quisiera consultar sobre el alquiler de vehículos de BS Select.",
+    "이름: ": "Nombre: ",
+    "전화번호: ": "Teléfono: ",
+    "이메일: ": "Correo: ",
+    "관심 차량: ": "Vehículo de interés: ",
+    "희망 렌트 기간: ": "Fechas deseadas: ",
+    "미정": "a definir",
+    "문의사항: ": "Comentarios: ",
+    "아래 버튼을 누르면 입력하신 내용으로 WhatsApp 메시지가 열립니다. 문의만으로 예약이 확정되지는 않습니다.": "El botón abre un mensaje de WhatsApp con sus datos. La consulta no confirma una reserva.",
+    "WhatsApp으로 문의 보내기": "Enviar consulta por WhatsApp",
+  },
+  en: {
+    "복사되었습니다": "Copied",
+    "사진 선택": "Choose photo",
+    "이름과 전화번호를 입력해 주세요.": "Please enter your name and phone number.",
+    "아직 정하지 않음": "Not decided yet",
+    "안녕하세요. BS Select 차량 렌탈 문의드립니다.": "Hello, I'd like to ask about renting a vehicle from BS Select.",
+    "이름: ": "Name: ",
+    "전화번호: ": "Phone: ",
+    "이메일: ": "Email: ",
+    "관심 차량: ": "Vehicle of interest: ",
+    "희망 렌트 기간: ": "Preferred dates: ",
+    "미정": "TBD",
+    "문의사항: ": "Comments: ",
+    "아래 버튼을 누르면 입력하신 내용으로 WhatsApp 메시지가 열립니다. 문의만으로 예약이 확정되지는 않습니다.": "The button opens a WhatsApp message with your details. An enquiry does not confirm a booking.",
+    "WhatsApp으로 문의 보내기": "Send enquiry on WhatsApp",
+  },
+};
+function localizeScript(js) {
+  const map = SCRIPT_TEXT[curLocale];
+  if (!map) return js;
+  return Object.entries(map)
+    .sort((a, b) => b[0].length - a[0].length)
+    .reduce((acc, [k, v]) => acc.split(k).join(v.replace(/"/g, '\\"')), js);
+}
+
 async function capture(file, isMain, adminMap, banner) {
   const html = await page.evaluate(
     ({ adminMapIn }) => {
@@ -179,7 +232,9 @@ async function capture(file, isMain, adminMap, banner) {
     imgMap[src] = name;
   }
   const fix = (s) =>
-    toPublicLinks(s).replace(/src="@@IMG([^"@]*)@@"/g, (_, e) => `src="${imgMap[decodeURIComponent(e)]}"`).replace(/href="@@([^"@]*)@@"/g, (_, e) => `href="${mapHref(toPublicLinks(decodeURIComponent(e)), adminMap)}"`);
+    toPublicLinks(s)
+      .replace(/src="@@IMG([^"@]*)@@"/g, (_, e) => `src="${upOf(curLocale)}${imgMap[decodeURIComponent(e)]}"`)
+      .replace(/href="@@([^"@]*)@@"/g, (_, e) => `href="${mapHref(toPublicLinks(decodeURIComponent(e)), adminMap, file)}"`);
   const bannerHtml = banner ? `<div class="preview-banner">${banner}</div>` : "";
   const style = `<link rel="stylesheet" href="${FONTS}"><style>${css}
 .preview-banner{background:#26282c;color:#e9eaed;font-size:12px;line-height:1.5;padding:8px max(16px,env(safe-area-inset-left,0px));text-align:center}
@@ -188,11 +243,12 @@ async function capture(file, isMain, adminMap, banner) {
 .preview-note:empty{display:none}
 </style>`;
   const head = fix(html.head).replace(/<meta name="viewport"[^>]*>/, "").replace(/<meta charset="[^"]*">/, "");
-  const body = bannerHtml + fix(html.body) + `<script>${PREVIEW_SCRIPT}${mode === "customer" ? CUSTOMER_FORM_SCRIPT : ""}</script>`;
+  const body = bannerHtml + fix(html.body) + `<script>${localizeScript(PREVIEW_SCRIPT + (mode === "customer" ? CUSTOMER_FORM_SCRIPT : ""))}</script>`;
   const doc = isMain
     ? `${head.match(/<title>[\s\S]*?<\/title>/)?.[0] ?? "<title>BS Select</title>"}\n${head.replace(/<title>[\s\S]*?<\/title>/, "")}\n${style}\n<div class="${html.htmlClass}">${body}</div>`
-    : `<!doctype html><html lang="ko" class="${html.htmlClass}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${head}${style}</head><body>${body}</body></html>`;
-  fs.writeFileSync(path.join(out, file), doc);
+    : `<!doctype html><html lang="${curLocale}" class="${html.htmlClass}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${head}${style}</head><body>${body}</body></html>`;
+  fs.mkdirSync(path.join(out, dirOf(curLocale)), { recursive: true });
+  fs.writeFileSync(path.join(out, dirOf(curLocale), file), doc);
 }
 
 fs.mkdirSync(out, { recursive: true });
@@ -222,11 +278,18 @@ if (mode === "admin") {
     await capture(p.file, p.file === "index.html", adminMap, banner);
   }
 } else {
-  // 고객용 페이지만 (관리자 화면·미리보기 안내 없음)
-  for (const p of pages) {
-    await page.goto(base + p.url);
-    await page.waitForLoadState("networkidle");
-    await capture(p.file, p.file === "index.html", {}, "");
+  // 고객용 페이지만 (관리자 화면·미리보기 안내 없음), 언어별로
+  for (const l of LOCALES) {
+    curLocale = l;
+    await context.close();
+    context = await browser.newContext({ viewport: { width: 1366, height: 900 }, locale: l === "ko" ? "ko-KR" : l });
+    await context.addCookies([{ name: "lang", value: l, url: base }]);
+    page = await context.newPage();
+    for (const p of pages) {
+      await page.goto(base + p.url);
+      await page.waitForLoadState("networkidle");
+      await capture(p.file, p.file === "index.html", {}, "");
+    }
   }
 }
 await browser.close();

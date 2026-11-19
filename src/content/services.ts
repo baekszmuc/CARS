@@ -30,26 +30,26 @@ export const tiresBattery = {
 };
 
 export const insurance = {
-  title: "전 위험 보험",
+  title: "종합보험 (Todo Riesgo)",
   coverage: ["화재", "사고", "도로상 차량 도난", "대인 배상", "대물 배상", "탑승자 상해"],
   note: "보험 보장 범위와 면책 조건은 실제 보험 약관 및 보험사 제안서를 기준으로 합니다.",
 };
 
 export const municipal = {
-  title: "시청 운행 허가",
-  text: "시청 운행 허가증(Habilitación Municipal)을 유지합니다.",
+  title: "시 운행 허가 유지",
+  text: "시 운행 허가(Habilitación Municipal)를 계약 기간 동안 유지합니다.",
 };
 
 export const support = {
-  title: "전화 기술 지원",
-  text: "평일 및 토요일 업무시간에 전화 기술 지원을 제공합니다.",
+  title: "전화 지원",
+  text: "차량 이용 중 궁금한 점이나 문제는 평일과 토요일 업무시간에 전화로 도와드립니다.",
 };
 
 export const serviceSummary = [
   { title: "예방 정비", text: "5,000–50,000 km 주행거리별 예방 정비" },
   { title: "주요 부품 교체", text: "브레이크·서스펜션·구동벨트 등 정비 계획에 따른 교체" },
-  { title: "타이어 및 배터리", text: "20,000 km마다 타이어 4개 및 배터리 교체" },
-  { title: "전 위험 보험", text: "화재·사고·도난·대인·대물·탑승자 상해" },
-  { title: "시청 운행 허가 유지", text: "Habilitación Municipal 유지" },
-  { title: "전화 기술 지원", text: "평일 및 토요일 업무시간" },
+  { title: "타이어 및 배터리", text: "20,000 km마다 타이어 4개와 배터리 교체" },
+  { title: "종합보험", text: "화재·사고·도난·대인·대물·탑승자 상해 보장" },
+  { title: "시 운행 허가 유지", text: "Habilitación Municipal" },
+  { title: "전화 지원", text: "평일·토요일 업무시간" },
 ];

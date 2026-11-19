@@ -1,12 +1,14 @@
+import { getT } from "@/i18n/server";
 import Image from "next/image";
 import { PhotoPlaceholder } from "./PhotoPlaceholder";
 import { photoUrl } from "@/lib/data";
 import type { VehiclePhoto as Photo } from "@/lib/types";
 
-export function ReferenceBadge() {
+export async function ReferenceBadge() {
+  const { t } = await getT();
   return (
     <span className="absolute bottom-2 left-2 rounded bg-obsidian/80 px-2 py-0.5 text-[10px] font-semibold text-white">
-      참고 이미지
+      {t("참고 이미지")}
     </span>
   );
 }
