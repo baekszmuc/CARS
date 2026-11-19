@@ -189,7 +189,7 @@ export const en: Record<string, string> = {
   "실제 차량 사진 준비 중": "Vehicle photo coming soon",
   "홈": "Home",
   "차량": "Vehicles",
-  "차는 고르기만 하세요. 관리는 저희가 합니다.": "You choose the car. We take care of the rest.",
+  "엄선된 차를 달리다.": "Drive the selected.",
   "월 렌트료 하나에 정기 정비, 보험, 운행 허가 유지까지 포함됩니다.": "One monthly fee covers scheduled maintenance, insurance and the municipal permit.",
   "렌탈 조건 보기": "View rental terms",
   "WhatsApp 상담 번호를 준비 중입니다. 아래 문의 양식을 이용해 주세요.": "Our WhatsApp number is coming soon. In the meantime, please use the form.",

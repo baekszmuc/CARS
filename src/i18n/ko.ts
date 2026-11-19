@@ -60,7 +60,7 @@ export const ko = {
     contact: "문의",
   },
   hero: {
-    title: "차는 고르기만 하세요. 관리는 저희가 합니다.",
+    title: "엄선된 차를 달리다.",
     subtitle: "월 렌트료 하나에 정기 정비, 보험, 운행 허가 유지까지 포함됩니다.",
     compare: "차량 비교하기",
     terms: "렌탈 조건 보기",

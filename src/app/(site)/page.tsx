@@ -44,7 +44,7 @@ export default async function HomePage() {
             <span aria-hidden="true"><LogoMark className="block h-auto w-full text-white" /></span>
           </h1>
           <div className="intro-rule lux-rule mt-10" />
-          <p style={{ "--d": 2 } as React.CSSProperties} className="intro mt-8 max-w-md text-lg font-light leading-relaxed text-white/90 sm:text-xl">{t(ko.hero.title)}</p>
+          <p style={{ "--d": 2 } as React.CSSProperties} className="intro mt-8 max-w-xl text-2xl font-light leading-tight tracking-tight text-white sm:text-4xl">{t(ko.hero.title)}</p>
           <p className="intro mt-3 max-w-md text-sm leading-relaxed text-white/55" style={{ "--d": 3 } as React.CSSProperties}>{t(ko.hero.subtitle)}</p>
           <div className="intro mt-10 flex flex-col gap-3 sm:flex-row" style={{ "--d": 4 } as React.CSSProperties}>
             <a href="#collection" className="btn btn-light">{t("차량 보기")}</a>
