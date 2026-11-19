@@ -3,23 +3,56 @@
 .preview-banner a{color:#fff;text-decoration:underline;margin-left:8px}
 .preview-note{display:grid;gap:10px;margin-top:4px;font-size:14px;color:#26282c}
 .preview-note:empty{display:none}
-</style><style id="motion-fallback">/* 스크롤 타임라인 미지원 브라우저: MotionScript 가 html.js-motion 과 .is-in 을 붙인다 */
+</style><style id="motion-fallback">/* 스크롤 모션 (MotionScript 가 html.js-motion, .is-in, --p, --c 를 넣는다). 스크립트가 켜지면 CSS 스크롤 타임라인은 끈다. */
 @media (prefers-reduced-motion: no-preference) {
+  .js-motion .reveal, .js-motion .reveal-photo, .js-motion .reveal-photo img, .js-motion .hero-parallax, .js-motion .hero-lift { animation: none !important; }
+
+  /* 등장: 아래에서 떠오르며 살짝 커진다 */
   .js-motion .reveal {
     opacity: 0;
-    transform: translateY(56px);
-    transition: opacity 0.9s ease, transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(64px) scale(0.97);
+    transition: opacity 0.9s ease, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
     transition-delay: calc(var(--ri, 0) * 90ms);
   }
   .js-motion .reveal.is-in { opacity: 1; transform: none; }
+
+  /* 홈 컬렉션 사진: 작은 카드에서 화면 쪽으로 커지며 모서리가 펴지고, 안쪽 사진은 패럴랙스 */
   .js-motion .reveal-photo {
-    clip-path: inset(14% 10% 14% 10%);
-    transition: clip-path 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: scale(calc(0.78 + 0.22 * var(--p, 1)));
+    border-radius: calc((1 - var(--p, 1)) * 28px);
+    opacity: calc(0.35 + 0.65 * var(--p, 1));
+    will-change: transform;
   }
-  .js-motion .reveal-photo img { transform: scale(1.22); transition: transform 1.8s cubic-bezier(0.16, 1, 0.3, 1); }
-  .js-motion .reveal-photo.is-in { clip-path: inset(0 0 0 0); }
-  .js-motion .reveal-photo.is-in img { transform: scale(1); }
-  .js-motion .hero-parallax, .js-motion .hero-lift { will-change: transform; }
+  .js-motion .reveal-photo img {
+    transform: scale(calc(1.28 - 0.13 * var(--p, 1))) translateY(calc(var(--c, 0) * 7%));
+    will-change: transform;
+  }
+
+  /* 컬렉션 제목: 넓은 자간에서 모이며 커진다 */
+  .js-motion #collection-title {
+    transform: scale(calc(0.86 + 0.14 * var(--p, 1)));
+    letter-spacing: calc((1 - var(--p, 1)) * 0.35em);
+    opacity: calc(0.2 + 0.8 * var(--p, 1));
+  }
+
+  /* 검은 서비스 섹션·문의 섹션: 카드처럼 좁게 시작해 화면 가득 넓어진다 */
+  .js-motion section[aria-labelledby="services"],
+  .js-motion section[aria-labelledby="contact"] {
+    clip-path: inset(0 calc((1 - var(--p, 1)) * 7vw) round calc((1 - var(--p, 1)) * 36px));
+  }
+
+  /* 카탈로그 차량 카드 사진: 들어오며 줌아웃 + 패럴랙스 */
+  .js-motion [data-testid="vehicle-card"] .aspect-\[4\/3\] img {
+    transform: scale(calc(1.25 - 0.17 * var(--p, 1))) translateY(calc(var(--c, 0) * 6%));
+  }
+
+  /* 차량 상세: 첫 화면 사진이 스크롤하면 앞으로 커진다 */
+  .js-motion .band-hero { overflow-x: clip; }
+  .js-motion .band-hero .max-w-4xl {
+    transform: scale(calc(1 + 0.1 * var(--s, 0)));
+    transform-origin: 50% 0;
+    will-change: transform;
+  }
 }
 </style></head><body><div hidden=""><!--$--><!--/$--></div><a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-white focus:p-2">Saltar al contenido</a><header class="site-header sticky top-0 z-30 border-b border-black/5 bg-[#f7f7f7]/95 backdrop-blur"><div class="container-page grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4"><div class="flex items-center gap-8"><details class="relative"><summary class="hdr-text flex cursor-pointer list-none items-center gap-2.5 text-sm text-charcoal hover:text-obsidian [&amp;::-webkit-details-marker]:hidden" aria-label="Abrir menú"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 5h16M2 10h16M2 15h16" stroke="currentColor" stroke-width="1.3"></path></svg>Menú</summary><nav aria-label="Menú" class="absolute left-0 mt-4 w-60 border border-black/10 bg-white p-2 shadow-xl"><ul><li><a class="block px-3 py-3 text-sm hover:bg-cloud" href="index.html">Inicio</a></li><li><a class="block px-3 py-3 text-sm hover:bg-cloud" href="vehiculos.html">Catálogo de vehículos</a></li><li><a class="block px-3 py-3 text-sm hover:bg-cloud" href="vehiculos.html#comparar">Comparar vehículos</a></li><li><a class="block px-3 py-3 text-sm hover:bg-cloud" href="servicios.html">Servicios incluidos</a></li><li><a class="block px-3 py-3 text-sm hover:bg-cloud" href="incluye.html">Qué se entrega</a></li><li><a class="block px-3 py-3 text-sm hover:bg-cloud" href="contacto.html">Contacto</a></li></ul></nav></details><nav aria-label="Menú principal" class="hidden lg:block"><ul class="flex items-center gap-6 text-xs text-graphite"><li><a class="hdr-text whitespace-nowrap hover:text-obsidian" href="vehiculos.html">Catálogo de vehículos</a></li><li><a class="hdr-text whitespace-nowrap hover:text-obsidian" href="vehiculos.html#comparar">Comparar vehículos</a></li><li><a class="hdr-text whitespace-nowrap hover:text-obsidian" href="servicios.html">Servicios incluidos</a></li></ul></nav></div><a class="inline-flex items-center" aria-label="BS Select 홈" href="index.html"><svg viewBox="0 0 620 52" class="h-[12px] sm:h-[14px] w-auto text-obsidian" fill="currentColor" role="img" aria-label="BS Select"><text x="0" y="44" textLength="620" lengthAdjust="spacing" style="font-family:var(--font-michroma), Michroma, sans-serif;font-size:50px">BS SELECT</text></svg></a><div class="flex items-center justify-end gap-5"><ul class="lang-switch flex items-center gap-2.5 text-[11px] tracking-[0.12em]" aria-label="Idioma"><li><a href="../incluye.html" hreflang="ko" lang="ko" title="한국어" data-lang="ko" class="hdr-text text-steel hover:text-obsidian">KO</a></li><li><a href="../es/incluye.html" hreflang="es" lang="es" title="Español" data-lang="es" aria-current="true" class="hdr-text font-semibold text-obsidian">ES</a></li><li><a href="../en/incluye.html" hreflang="en" lang="en" title="English" data-lang="en" class="hdr-text text-steel hover:text-obsidian">EN</a></li></ul><a class="hdr-text hidden text-sm text-charcoal hover:text-obsidian sm:inline" href="contacto.html">Contacto</a></div></div></header><main id="main"><div class="bg-white"><div class="container-page grid gap-4 py-10 md:grid-cols-[1fr_minmax(0,24rem)] md:items-end"><div><p class="eyebrow">Entrega</p><h1 class="mt-2 text-3xl font-normal tracking-tight sm:text-4xl">Qué se entrega con el vehículo</h1></div><p class="text-sm leading-relaxed text-graphite">Lista básica prevista en el contrato. La entrega de cada documento e ítem depende del contrato y de cada vehículo; lo verificamos antes de la entrega.</p></div></div><div class="container-page py-14"><div class="grid gap-5 lg:grid-cols-3"><section class="bg-white p-5" aria-label="Documentos del vehículo"><h3 class="font-bold">Documentos del vehículo</h3><ul class="mt-3 space-y-1.5 text-sm"><li class="flex gap-2"><span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-obsidian"></span><span>Cédula verde<span class="text-graphite"> (<!-- -->Cédula Verde<!-- -->)</span></span></li><li class="flex gap-2"><span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-obsidian"></span><span>Habilitación de circulación</span></li><li class="flex gap-2"><span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-obsidian"></span><span>Copia del título de propiedad</span></li><li class="flex gap-2"><span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-obsidian"></span><span>Certificado de despacho aduanero</span></li><li class="flex gap-2"><span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-obsidian"></span><span>Autorización de uso (Garden)</span></li></ul></section><section class="bg-white p-5" aria-label="Accesorios del vehículo"><h3 class="font-bold">Accesorios del vehículo</h3><ul class="mt-3 space-y-1.5 text-sm"><li class="flex gap-2"><span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-obsidian"></span><span>Balizas triangulares</span></li><li class="flex gap-2"><span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-obsidian"></span><span>Gato</span></li><li class="flex gap-2"><span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-obsidian"></span><span>Juego de herramientas</span></li><li class="flex gap-2"><span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-obsidian"></span><span>Extintor</span></li><li class="flex gap-2"><span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-obsidian"></span><span>Llave de rueda</span></li><li class="flex gap-2"><span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-obsidian"></span><span>Rueda de auxilio</span></li><li class="flex gap-2"><span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-obsidian"></span><span>Alfombras</span></li><li class="flex gap-2"><span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-obsidian"></span><span>Manual del vehículo</span></li><li class="flex gap-2"><span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-obsidian"></span><span>Libreta de mantenimiento</span></li></ul></section><section class="bg-white p-5" aria-label="Llaves"><h3 class="font-bold">Llaves</h3><ul class="mt-3 space-y-1.5 text-sm"><li class="flex gap-2"><span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-obsidian"></span><span>2 juegos de llaves</span></li></ul></section></div></div><!--$--><!--/$--></main><footer class="mt-24 bg-obsidian text-silver"><div class="container-page py-14"><div class="grid gap-10 md:grid-cols-[1fr_1fr_1.2fr]"><nav aria-label="Menú del sitio"><ul class="space-y-1.5 text-sm font-medium uppercase tracking-wide text-white"><li><a class="hover:text-silver" href="vehiculos.html">Catálogo de vehículos</a></li><li><a class="hover:text-silver" href="vehiculos.html#comparar">Comparar vehículos</a></li><li><a class="hover:text-silver" href="servicios.html">Servicios incluidos</a></li><li><a class="hover:text-silver" href="incluye.html">Qué se entrega</a></li></ul></nav><div><p class="text-sm font-medium uppercase tracking-wide text-white">Contacto</p><ul class="mt-2 space-y-1.5 text-xs"><li class="text-steel">Déjenos su consulta en el formulario y le contactaremos.</li><li><a class="hover:text-white" href="contacto.html">Formulario de consulta<!-- --> ↗</a></li></ul></div><p class="text-xs leading-relaxed text-steel md:text-right">Alquiler mensual de vehículos en Paraguay. Mantenimiento y seguro incluidos.<br>Los precios y condiciones publicados se confirman en el contrato de alquiler.</p></div><div class="mt-16 flex flex-col-reverse gap-6 border-t border-white/10 pt-8 md:flex-row md:items-end md:justify-between"><p class="text-[10px] text-steel">© <!-- -->2026<!-- --> <!-- -->BS Select<!-- --> · <a class="hover:text-white" href="privacidad.html">Política de privacidad</a></p><svg viewBox="0 0 620 52" class="h-7 w-auto text-white sm:h-10" fill="currentColor" role="img" aria-label="BS Select"><text x="0" y="44" textLength="620" lengthAdjust="spacing" style="font-family:var(--font-michroma), Michroma, sans-serif;font-size:50px">BS SELECT</text></svg></div></div></footer><script>
 document.addEventListener("click", function (e) {
@@ -63,27 +96,34 @@ document.addEventListener("submit", function (e) {
   note.appendChild(p); note.appendChild(a); a.focus();
 });</script><script id="motion-script">(function(){
 var d=document.documentElement;
-if(!window.IntersectionObserver||window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
-if(window.CSS&&CSS.supports&&CSS.supports("animation-timeline: view()"))return;
+if(!window.IntersectionObserver||!window.requestAnimationFrame||window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
 d.classList.add("js-motion");
+var SCRUB=".reveal-photo,[data-testid=vehicle-card] .aspect-\\[4\\/3\\],section[aria-labelledby=services],section[aria-labelledby=contact],#collection-title,.band-hero .max-w-4xl";
+function cl(v){return v<0?0:v>1?1:v}
 function init(){
-  var els=[].slice.call(document.querySelectorAll(".reveal,.reveal-photo"));
-  els.forEach(function(el){
+  var rv=[].slice.call(document.querySelectorAll(".reveal,.reveal-photo"));
+  rv.forEach(function(el){
     var sib=el.parentElement?[].slice.call(el.parentElement.children).filter(function(c){return c.classList.contains("reveal")||c.classList.contains("reveal-photo")}):[];
     el.style.setProperty("--ri",Math.min(Math.max(sib.indexOf(el),0),5));
   });
   var io=new IntersectionObserver(function(es){es.forEach(function(e){
     if(e.isIntersecting)e.target.classList.add("is-in");
     else if(e.boundingClientRect.top>0)e.target.classList.remove("is-in");
-  })},{rootMargin:"0px 0px -12% 0px",threshold:0.05});
-  els.forEach(function(el){io.observe(el)});
-  var p=document.querySelector(".hero-parallax"),l=[].slice.call(document.querySelectorAll(".hero-lift")),t=false;
-  if(!p&&!l.length)return;
-  function f(){t=false;var h=window.innerHeight,y=Math.min(window.scrollY,h);
-    if(p)p.style.transform="scale("+(1+0.15*y/h)+") translateY("+(8*y/h)+"%)";
-    var k=Math.min(window.scrollY/(0.75*h),1);
-    l.forEach(function(e){e.style.opacity=String(1-k);e.style.transform="translateY("+(-80*k)+"px)"});}
-  window.addEventListener("scroll",function(){if(!t){t=true;requestAnimationFrame(f)}},{passive:true});f();
+  })},{rootMargin:"0px 0px -10% 0px",threshold:0.05});
+  rv.forEach(function(el){io.observe(el)});
+  var sc=[].slice.call(document.querySelectorAll(SCRUB));
+  var hp=document.querySelector(".hero-parallax"),hl=[].slice.call(document.querySelectorAll(".hero-lift")),bh=document.querySelector(".band-hero .max-w-4xl"),tk=false;
+  function f(){tk=false;var vh=window.innerHeight,y=window.scrollY;
+    sc.forEach(function(el){var r=el.getBoundingClientRect();if(r.bottom<-vh||r.top>2*vh)return;
+      el.style.setProperty("--p",cl((vh-r.top)/(vh*0.75)).toFixed(3));
+      el.style.setProperty("--c",Math.max(-1,Math.min(1,(r.top+r.height/2-vh/2)/vh)).toFixed(3));});
+    var k=cl(y/vh);
+    if(hp)hp.style.transform="scale("+(1+0.18*k)+") translateY("+(10*k)+"%)";
+    var q=cl(y/(0.75*vh));hl.forEach(function(e){e.style.opacity=String(1-q);e.style.transform="translateY("+(-90*q)+"px) scale("+(1-0.06*q)+")"});
+    if(bh)bh.style.setProperty("--s",cl(y/(0.6*vh)).toFixed(3));
+  }
+  function on(){if(!tk){tk=true;requestAnimationFrame(f)}}
+  window.addEventListener("scroll",on,{passive:true});window.addEventListener("resize",on);f();
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();</script></body></html>
