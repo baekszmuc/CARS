@@ -8,7 +8,7 @@ const INITIAL = [
   { slug: "tivoli-2023", title: "Tivoli 2023", base: 800, iva: 80, total: 880, year: "2023", km: "25,000 km" },
   { slug: "kia-seltos", title: "Kia Seltos 2027", base: 900, iva: 90, total: 990, year: "2027", km: "0 km" },
   { slug: "tucson", title: "Tucson 2026", base: 1100, iva: 110, total: 1210, year: "2026", km: "0 km" },
-  { slug: "kia-sorento-hev", title: "Kia Sorento HEV", base: 1350, iva: 135, total: 1485, year: "", km: "" },
+  { slug: "kia-sorento-hev", title: "Kia Sorento HEV", base: 1227.27, iva: 122.73, total: 1350, year: "", km: "" },
 ];
 
 const TEST_NAME = `E2E Prueba ${Date.now().toString(36)}`;
