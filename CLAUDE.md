@@ -7,6 +7,8 @@
 - 사용자가 제공하지 않은 사업 정보(전화, 이메일, 주소, 도메인, 계약 조건)·차량 사양을 만들어 넣지 않는다.
 - 초기 가격은 바꾸지 않는다: Tivoli 2023 USD 800/80/880, Kia Seltos 2027 USD 900/90/990, Tucson 2026 USD 1,100/110/1,210 (월, IVA 10%).
 - 실제 차량이 아닌 사진은 `vehicle_photos.is_reference = true` (화면에 "참고 이미지" 표시). 현재 세 차량 모두 제조사 공식 보도용 사진이므로 is_reference = true (출처: assets/vehicle-photos/SOURCES.md).
+- 문의(WhatsApp) 번호: +595 983 826292 (2026-11-24 운영자 제공, migration 20261124000000).
+- Michroma 서체는 로고(LogoMark)에만 쓴다. 제목·가격·버튼은 본문 서체.
 - 서비스 권한 키(service_role / secret)는 앱 코드·Vercel·커밋에 넣지 않는다. 관리자 생성 스크립트에서만 사용.
 
 ## 명령
@@ -38,4 +40,4 @@ npm run preview:snapshot -- 출력폴더               # 정적 디자인 미리
 7. 차량 사진 업로드: `assets/vehicle-photos/{tivoli-2023,kia-seltos,tucson}` (파일명 순서 = 표시 순서, 01 이 대표 사진). 관리자 화면에서 업로드하거나 관리자 세션으로 Storage 업로드 후 `vehicle_photos` 등록. 세 차량 모두 is_reference = true (공식 사진).
 
 ## 미정 사항 (사용자 확인 필요)
-WhatsApp 번호, 전화, 이메일, 주소, Instagram, 실제 도메인, 지원 업무시간, 보험 계약 상태, IVA 확인 여부, 부속서 C 정비 주기, TT Interphases 서체 파일(현재 Inter 대체).
+전화, 이메일, 주소, Instagram, 실제 도메인, 지원 업무시간, 보험 계약 상태, IVA 확인 여부, 부속서 C 정비 주기, TT Interphases 서체 파일(현재 Inter 대체).

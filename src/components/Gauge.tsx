@@ -13,7 +13,7 @@ export function Gauge({ value, unit, fraction, label }: { value: string; unit: s
         <circle cx="110" cy="110" r={r} fill="none" stroke="#c9cbd0" strokeWidth="1.5" strokeDasharray={`${arc} ${c}`} />
         <circle cx="110" cy="110" r={r} fill="none" stroke="#121417" strokeWidth="3" strokeDasharray={`${arc * f} ${c}`} />
       </g>
-      <text x="110" y="118" textAnchor="middle" style={{ fontFamily: "var(--font-michroma), sans-serif", fontSize: 40 }}>
+      <text x="110" y="118" textAnchor="middle" style={{ fontFamily: "var(--font-display), sans-serif", fontSize: 40, fontWeight: 300 }}>
         {value}
       </text>
       <text x="110" y="150" textAnchor="middle" fill="#4a4d53" style={{ fontSize: 15 }}>
