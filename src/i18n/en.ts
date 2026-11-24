@@ -296,4 +296,11 @@ export const en: Record<string, string> = {
   "약 2,755 mm": "approx. 2,755 mm",
   "1.5 CRDi 디젤": "1.5 CRDi diesel",
   "1.6 Turbo HEV 하이브리드": "1.6 Turbo HEV hybrid",
+  "대형 SUV": "Large SUV",
+  "3열": "3 rows",
+  "파워트레인": "Powertrain",
+  "하이브리드 (HEV)": "Hybrid (HEV)",
+  "자동 (AT)": "Automatic (AT)",
+  "트림": "Trim",
+  "EX AT 2WD Semi Full 하이브리드": "EX AT 2WD Semi Full hybrid",
 };

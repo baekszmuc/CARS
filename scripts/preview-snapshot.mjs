@@ -247,7 +247,8 @@ async function capture(file, isMain, adminMap, banner) {
 </style>`;
   const head = fix(html.head).replace(/<meta name="viewport"[^>]*>/, "").replace(/<meta charset="[^"]*">/, "");
   const body = bannerHtml + fix(html.body) + `<script>${localizeScript(PREVIEW_SCRIPT + (mode === "customer" ? CUSTOMER_FORM_SCRIPT : ""))}</script>`;
-  const doc = isMain
+  // 첫 페이지를 조각(fragment)으로 내보내는 것은 Artifact 게시용일 때만 (PREVIEW_FRAGMENT_INDEX=1). GitHub Pages 용은 완전한 HTML.
+  const doc = isMain && process.env.PREVIEW_FRAGMENT_INDEX === "1"
     ? `${head.match(/<title>[\s\S]*?<\/title>/)?.[0] ?? "<title>BS Select</title>"}\n${head.replace(/<title>[\s\S]*?<\/title>/, "")}\n${style}\n<div class="${html.htmlClass}">${body}</div>`
     : `<!doctype html><html lang="${curLocale}" class="${html.htmlClass}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${head}${style}</head><body>${body}</body></html>`;
   fs.mkdirSync(path.join(out, dirOf(curLocale)), { recursive: true });

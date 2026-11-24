@@ -8,6 +8,7 @@ const INITIAL = [
   { slug: "tivoli-2023", title: "Tivoli 2023", base: 800, iva: 80, total: 880, year: "2023", km: "25,000 km" },
   { slug: "kia-seltos", title: "Kia Seltos 2027", base: 900, iva: 90, total: 990, year: "2027", km: "0 km" },
   { slug: "tucson", title: "Tucson 2026", base: 1100, iva: 110, total: 1210, year: "2026", km: "0 km" },
+  { slug: "kia-sorento-hev", title: "Kia Sorento HEV", base: 1350, iva: 135, total: 1485, year: "", km: "" },
 ];
 
 const TEST_NAME = `E2E Prueba ${Date.now().toString(36)}`;
@@ -24,9 +25,9 @@ test("1. BS Select 웹사이트가 정상적으로 열린다", async ({ page }) 
   const res = await page.goto("/");
   expect(res?.status()).toBe(200);
   await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName("BS Select 차량 렌탈");
-  // 홈: 브랜드 랜딩 — 컬렉션에 차량 3종이 모두 보인다
-  await expect(page.getByTestId("home-vehicle")).toHaveCount(3);
-  for (const name of [/Tivoli 2023$/, /Kia Seltos 2027$/, /Tucson 2026$/]) {
+  // 홈: 브랜드 랜딩 — 컬렉션에 등록 차량이 모두 보인다
+  await expect(page.getByTestId("home-vehicle")).toHaveCount(INITIAL.length);
+  for (const name of [/Tivoli 2023$/, /Kia Seltos 2027$/, /Tucson 2026$/, /Kia Sorento HEV$/]) {
     await expect(page.getByRole("heading", { name })).toBeVisible();
   }
   await expect(page.getByRole("heading", { name: "렌트료에 포함된 서비스" })).toBeVisible();
@@ -50,7 +51,7 @@ test("15. 언어 전환: 스페인어·영어로 바뀌고 선택이 유지된�
   await context.clearCookies();
 });
 
-test("2·3. 초기 차량 3종이 정확한 가격으로 표시되고 IVA 합계가 일치한다", async ({ page }) => {
+test("2·3. 초기 차량이 정확한 가격으로 표시되고 IVA 합계가 일치한다", async ({ page }) => {
   await page.goto("/vehiculos");
   for (const v of INITIAL) {
     const card = await cardFor(page, v.title);
@@ -336,14 +337,14 @@ test("13. 게시 중단한 차량은 공개 카탈로그에서 제외된다", as
 
   await page.goto("/vehiculos");
   await expect(await cardFor(page, `${TEST_NAME} 2024`)).toHaveCount(0);
-  await expect(page.getByTestId("vehicle-card")).toHaveCount(3);
+  await expect(page.getByTestId("vehicle-card")).toHaveCount(INITIAL.length);
   const res = await page.goto(`/vehiculos/${testVehicleSlug}`);
   expect(res?.status()).toBe(404);
   const sitemap = await (await page.request.get("/sitemap.xml")).text();
   expect(sitemap).not.toContain(testVehicleSlug);
 });
 
-test("정리: 테스트 차량 삭제 후 초기 3종만 남는다", async ({ page }) => {
+test("정리: 테스트 차량 삭제 후 초기 차량만 남는다", async ({ page }) => {
   await login(page);
   for (const url of [testVehicleAdminUrl, duplicateAdminUrl]) {
     await page.goto(url);
@@ -352,5 +353,5 @@ test("정리: 테스트 차량 삭제 후 초기 3종만 남는다", async ({ pa
     await expect(page).toHaveURL(/\/admin\/vehiculos\?deleted=1/);
   }
   await page.goto("/vehiculos");
-  await expect(page.getByTestId("vehicle-card")).toHaveCount(3);
+  await expect(page.getByTestId("vehicle-card")).toHaveCount(INITIAL.length);
 });
